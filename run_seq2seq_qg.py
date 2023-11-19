@@ -29,7 +29,7 @@ import datasets
 import evaluate
 import numpy as np
 from datasets import load_dataset
-from trainer_seq2seq_qa import QuestionAnsweringSeq2SeqTrainer
+from trainer_seq2seq_qg import QuestionAnsweringSeq2SeqTrainer
 
 import transformers
 from transformers import (
