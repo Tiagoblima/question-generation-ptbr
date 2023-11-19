@@ -486,10 +486,11 @@ def main():
         contexts = examples[context_column]
         answers = examples[answer_column]
 
-        def generate_input(_context):
-            return " ".join(["context:", _context.lstrip()])
+        def generate_input(_answer, _context):
+            return " ".join(["context:", _context.lstrip(), "answer:", _answer.lstrip()])
         print(answers[:3])
-        inputs = [generate_input(context) for context in contexts]
+        inputs = [generate_input( answer["text"][0] if len(question) > 0 else "", context) 
+                    for answer, context in zip(answers, contexts)]
         targets = [question if len(question) > 0 else "" for question in questions]
         return inputs, targets
 
