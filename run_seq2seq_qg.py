@@ -486,10 +486,10 @@ def main():
         contexts = examples[context_column]
         answers = examples[answer_column]
 
-        def generate_input(_answer, _context):
-            return " ".join(["context:", _context.lstrip(), "answer:", _answer.lstrip(),])
+        def generate_input(_context):
+            return " ".join(["context:", _context.lstrip()])
         print(answers[:3])
-        inputs = [generate_input(answer["text"][0], context) for answer, context in zip(answers, contexts)]
+        inputs = [generate_input(context) for context in zip(answers, contexts)]
         targets = [question if len(question) > 0 else "" for question in questions]
         return inputs, targets
 
@@ -583,7 +583,7 @@ def main():
             max_eval_samples = min(len(eval_examples), data_args.max_eval_samples)
             eval_examples = eval_examples.select(range(max_eval_samples))
         # Validation Feature Creation
-        print(eval_examples[:3])
+       
         with training_args.main_process_first(desc="validation dataset map pre-processing"):
             eval_dataset = eval_examples.map(
                 preprocess_validation_function,
