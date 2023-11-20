@@ -29,7 +29,7 @@ import datasets
 import evaluate
 import numpy as np
 from datasets import load_dataset
-from trainer_seq2seq_qa import QuestionAnsweringSeq2SeqTrainer
+from trainer_seq2seq_qg import QuestionAnsweringSeq2SeqTrainer
 
 import transformers
 from transformers import (
@@ -486,11 +486,12 @@ def main():
         contexts = examples[context_column]
         answers = examples[answer_column]
 
-        def generate_input(_question, _context):
-            return " ".join(["question:", _question.lstrip(), "context:", _context.lstrip()])
-
-        inputs = [generate_input(answer, context) for answer, context in zip(answers, contexts)]
-        targets = [question["text"][0] if len(question["text"]) > 0 else "" for question in questions]
+        def generate_input(_answer, _context):
+            return " ".join(["context:", _context.lstrip(), "answer:", _answer.lstrip()])
+        print(answers[:3])
+        inputs = [generate_input( answer["text"][0] if len(question) > 0 else "", context) 
+                    for answer, context in zip(answers, contexts)]
+        targets = [question if len(question) > 0 else "" for question in questions]
         return inputs, targets
 
     def preprocess_function(examples):
@@ -583,6 +584,7 @@ def main():
             max_eval_samples = min(len(eval_examples), data_args.max_eval_samples)
             eval_examples = eval_examples.select(range(max_eval_samples))
         # Validation Feature Creation
+       
         with training_args.main_process_first(desc="validation dataset map pre-processing"):
             eval_dataset = eval_examples.map(
                 preprocess_validation_function,
