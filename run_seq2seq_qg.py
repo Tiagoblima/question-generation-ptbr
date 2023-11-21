@@ -488,7 +488,7 @@ def main():
 
         def generate_input(_answer, _context):
             return " ".join(["context:", _context.lstrip(), "answer:", _answer.lstrip()])
-        print(answers[:3])
+       
         inputs = [generate_input( answer["text"][0] if len(answer["text"]) > 0 else "", context) 
                     for answer, context in zip(answers, contexts)]
         targets = [question if len(question) > 0 else "" for question in questions]
