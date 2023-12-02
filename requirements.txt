@@ -2,3 +2,7 @@ accelerate >= 0.22.0
 datasets
 transformers
 evaluate
+pandas
+datasets
+numpy
+spacy
