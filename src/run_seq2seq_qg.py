@@ -546,7 +546,7 @@ def main():
         for i in range(len(model_inputs["input_ids"])):
             # One example can give several spans, this is the index of the example containing this span of text.
             sample_index = sample_mapping[i]
-            model_inputs["example_id"].append(examples["id"][sample_index])
+            model_inputs["example_id"].append(examples["paragraph_id"][sample_index])
             labels_out.append(labels["input_ids"][sample_index])
 
         model_inputs["labels"] = labels_out
@@ -648,14 +648,14 @@ def main():
         decoded_preds = tokenizer.batch_decode(preds, skip_special_tokens=True)
 
         # Build a map example to its corresponding features.
-        example_id_to_index = {k: i for i, k in enumerate(examples["id"])}
+        example_id_to_index = {k: i for i, k in enumerate(examples["paragraph_id"])}
         feature_per_example = {example_id_to_index[feature["example_id"]]: i for i, feature in enumerate(features)}
         predictions = {}
         # Let's loop over all the examples!
         for example_index, example in enumerate(examples):
             # This is the index of the feature associated to the current example.
             feature_index = feature_per_example[example_index]
-            predictions[example["id"]] = decoded_preds[feature_index]
+            predictions[example["paragraph_id"]] = decoded_preds[feature_index]
 
         # Format the result to the format the metric expects.
         if data_args.version_2_with_negative:
@@ -665,7 +665,7 @@ def main():
         else:
             formatted_predictions = [{"id": k, "prediction_text": v} for k, v in predictions.items()]
 
-        references = [{"id": ex["id"], "answers": ex[answer_column]} for ex in examples]
+        references = [{"id": ex["paragraph_id"], "answers": ex[answer_column]} for ex in examples]
         return EvalPrediction(predictions=formatted_predictions, label_ids=references)
 
     # Initialize our Trainer
