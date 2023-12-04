@@ -42,7 +42,7 @@ class QuestionAnsweringSeq2SeqTrainer(Seq2SeqTrainer):
         eval_dataset: Optional[Dataset] = None,
         eval_examples=None,
         ignore_keys: Optional[List[str]] = None,
-        metric_key_prefix: str = "eval",
+        metric_key_prefix: str = None,
         **gen_kwargs,
     ) -> Dict[str, float]:
         gen_kwargs = gen_kwargs.copy()
