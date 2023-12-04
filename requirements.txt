@@ -2,8 +2,11 @@ accelerate >= 0.22.0
 datasets
 transformers
 evaluate
+sentencepiece 
 pandas
 datasets
 numpy
 spacy
 nltk
+wandb
+sacrebleu>2.0.0

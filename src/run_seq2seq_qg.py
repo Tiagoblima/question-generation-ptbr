@@ -667,7 +667,7 @@ def main():
 
         references = [{"id": ex["paragraph_id"], "answers": ex[answer_column]} for ex in examples]
         return EvalPrediction(predictions=formatted_predictions, label_ids=references)
-
+    
     # Initialize our Trainer
     trainer = QuestionAnsweringSeq2SeqTrainer(
         model=model,
