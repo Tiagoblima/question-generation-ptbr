@@ -1,6 +1,6 @@
 #HUGGINGFACE_TOKEN=
 
-python /question-generation-ptbr/src/run_seq2seq_qg.py \
+python content/question-generation-ptbr/src/run_seq2seq_qg.py \
   --model_name_or_path unicamp-dl/ptt5-small-t5-vocab \
   --dataset_name tiagoblima/qg_squad_v1_pt \
   --context_column paragraph \
