@@ -1,8 +1,6 @@
-export $(grep -v '^#' scripts/.env | xargs)
-WANDB_PROJECT=question-generation-ptbr
-
 echo $PWD
-pip install -r requirements.txt
+source venv/bin/activate
+#pip install -r requirements.txt
 
 SIZE=base
 BASE_MODEL=unicamp-dl/ptt5-${SIZE}-t5-vocab
