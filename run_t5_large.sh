@@ -24,6 +24,7 @@ python src/run_seq2seq_qg.py \
   --save_total_limit 3 \
   --push_to_hub \
   --report_to "wandb" \
-  --run_name "exp-baseline" \
+  --run_name "t5_large" \
+  --evaluation_strategy "steps" \
   --push_to_hub_token $HUGGINGFACE_TOKEN \
   --output_dir /tmp/debug_t5-${SIZE}_squad/
