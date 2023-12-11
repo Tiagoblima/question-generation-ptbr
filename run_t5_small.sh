@@ -1,8 +1,3 @@
-echo $PWD
-
-source venv/bin/activate
-#pip install -r requirements.txt
-
 SIZE=small
 BASE_MODEL=unicamp-dl/ptt5-${SIZE}-t5-vocab
 

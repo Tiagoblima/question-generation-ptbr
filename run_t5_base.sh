@@ -1,8 +1,3 @@
-echo $PWD
-
-source venv/bin/activate
-#pip install -r requirements.txt
-
 SIZE=base
 BASE_MODEL=unicamp-dl/ptt5-${SIZE}-t5-vocab
 
@@ -15,7 +10,7 @@ python src/run_seq2seq_qg.py \
   --answer_column answer \
   --do_train \
   --do_eval \
-  --per_device_train_batch_size 64 \
+  --per_device_train_batch_size 16 \
   --learning_rate 0.0001 \
   --num_train_epochs 2 \
   --max_seq_length 384 \
