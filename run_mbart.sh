@@ -17,6 +17,7 @@ python src/run_seq2seq_qg.py \
   --doc_stride 128 \
   --save_total_limit 5 \
   --push_to_hub \
+  --use_fast_tokenizer \
   --report_to "wandb" \
   --run_name "t5_base" \
   --push_to_hub_token $HUGGINGFACE_TOKEN \
