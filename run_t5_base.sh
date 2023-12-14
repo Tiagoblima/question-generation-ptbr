@@ -1,4 +1,4 @@
-SIZE=base
+SIZE="base"
 BASE_MODEL=unicamp-dl/ptt5-${SIZE}-t5-vocab
 
 
