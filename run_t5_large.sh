@@ -13,7 +13,7 @@ python src/run_seq2seq_qg.py \
   --per_device_train_batch_size 1 \
   --learning_rate 0.0001 \
   --gradient_checkpointing \
-  --gradient_accumulation 4 \
+  --gradient_accumulation 8 \
   --num_train_epochs 2 \
   --max_seq_length 384 \
   --doc_stride 128 \
