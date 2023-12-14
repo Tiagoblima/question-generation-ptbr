@@ -69,6 +69,12 @@ class ModelArguments:
     tokenizer_name: Optional[str] = field(
         default=None, metadata={"help": "Pretrained tokenizer name or path if not the same as model_name"}
     )
+    src_lang: Optional[str] = field(
+        default=None, metadata={"help": "Source language required to models like mBart"}
+    )
+    tgt_lang: Optional[str] = field(
+        default=None, metadata={"help": "Source language required to models like mBart"}
+    )
     cache_dir: Optional[str] = field(
         default=None,
         metadata={"help": "Path to directory to store the pretrained models downloaded from huggingface.co"},
@@ -393,6 +399,12 @@ def main():
         token=model_args.token,
         trust_remote_code=model_args.trust_remote_code,
     )
+
+    kwargs = {
+        "src_lang":model_args.src_lang,
+        "tgt_lang": model_args.tgt_lang
+    }
+
     tokenizer = AutoTokenizer.from_pretrained(
         model_args.tokenizer_name if model_args.tokenizer_name else model_args.model_name_or_path,
         cache_dir=model_args.cache_dir,
@@ -400,7 +412,7 @@ def main():
         revision=model_args.model_revision,
         token=model_args.token,
         trust_remote_code=model_args.trust_remote_code,
-         src_lang="pt_XX", tgt_lang="pt_XX"
+        **kwargs if (model_args.src_lang or model_args.tgt_lang) 
     )
     model = AutoModelForSeq2SeqLM.from_pretrained(
         model_args.model_name_or_path,

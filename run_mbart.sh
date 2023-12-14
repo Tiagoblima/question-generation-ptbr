@@ -10,6 +10,8 @@ python src/run_seq2seq_qg.py \
   --answer_column answer \
   --do_train \
   --do_eval \
+  --src_lang "pt_XX" \
+  --tgt_lang "pt_XX" \
   --per_device_train_batch_size 2 \
   --learning_rate 0.0001 \
   --num_train_epochs 2 \
