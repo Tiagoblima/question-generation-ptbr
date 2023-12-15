@@ -17,7 +17,7 @@ python src/run_seq2seq_qg.py \
   --num_train_epochs 2 \
   --max_seq_length 384 \
   --doc_stride 128 \
-  --save_total_limit 5 \
+  --save_total_limit 3 \
   --push_to_hub \
   --use_fast_tokenizer \
   --report_to "wandb" \
