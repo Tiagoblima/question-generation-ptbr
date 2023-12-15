@@ -403,7 +403,7 @@ def main():
     kwargs = {
         "src_lang":model_args.src_lang,
         "tgt_lang": model_args.tgt_lang
-    }
+    }  if (model_args.src_lang or model_args.tgt_lang) else {}
 
     tokenizer = AutoTokenizer.from_pretrained(
         model_args.tokenizer_name if model_args.tokenizer_name else model_args.model_name_or_path,
@@ -412,7 +412,7 @@ def main():
         revision=model_args.model_revision,
         token=model_args.token,
         trust_remote_code=model_args.trust_remote_code,
-        **kwargs if (model_args.src_lang or model_args.tgt_lang) 
+        **kwargs
     )
     model = AutoModelForSeq2SeqLM.from_pretrained(
         model_args.model_name_or_path,
