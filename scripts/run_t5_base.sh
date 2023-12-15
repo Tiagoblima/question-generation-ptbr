@@ -15,7 +15,7 @@ python src/run_seq2seq_qg.py \
   --num_train_epochs 2 \
   --max_seq_length 384 \
   --doc_stride 128 \
-  --save_total_limit 5 \
+  --save_total_limit 3 \
   --push_to_hub \
   --report_to "wandb" \
   --run_name "t5_base" \
