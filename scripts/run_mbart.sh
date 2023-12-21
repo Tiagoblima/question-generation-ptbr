@@ -12,7 +12,8 @@ python src/run_seq2seq_qg.py \
   --do_eval \
   --src_lang "pt_XX" \
   --tgt_lang "pt_XX" \
-  --per_device_train_batch_size 2 \
+  --per_device_train_batch_size 1 \
+  --per_gradient_accumulation 1 \
   --learning_rate 0.0001 \
   --num_train_epochs 2 \
   --max_seq_length 384 \
