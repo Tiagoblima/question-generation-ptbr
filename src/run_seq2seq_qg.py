@@ -69,6 +69,12 @@ class ModelArguments:
     tokenizer_name: Optional[str] = field(
         default=None, metadata={"help": "Pretrained tokenizer name or path if not the same as model_name"}
     )
+    src_lang: Optional[str] = field(
+        default=None, metadata={"help": "Source language required to models like mBart"}
+    )
+    tgt_lang: Optional[str] = field(
+        default=None, metadata={"help": "Source language required to models like mBart"}
+    )
     cache_dir: Optional[str] = field(
         default=None,
         metadata={"help": "Path to directory to store the pretrained models downloaded from huggingface.co"},
@@ -393,6 +399,12 @@ def main():
         token=model_args.token,
         trust_remote_code=model_args.trust_remote_code,
     )
+
+    kwargs = {
+        "src_lang":model_args.src_lang,
+        "tgt_lang": model_args.tgt_lang
+    }  if (model_args.src_lang or model_args.tgt_lang) else {}
+
     tokenizer = AutoTokenizer.from_pretrained(
         model_args.tokenizer_name if model_args.tokenizer_name else model_args.model_name_or_path,
         cache_dir=model_args.cache_dir,
@@ -400,6 +412,7 @@ def main():
         revision=model_args.model_revision,
         token=model_args.token,
         trust_remote_code=model_args.trust_remote_code,
+        **kwargs
     )
     model = AutoModelForSeq2SeqLM.from_pretrained(
         model_args.model_name_or_path,
@@ -487,11 +500,11 @@ def main():
         answers = examples[answer_column]
 
         def generate_input(_answer, _context):
-            return " ".join(["context:", _context.lstrip(), "answer:", _answer.lstrip()])
+            return " ".join(["answer:", _answer.lstrip(), "context:", _context.lstrip(), ])
        
-        inputs = [generate_input( answer["text"][0] if len(answer["text"]) > 0 else "", context) 
+        inputs = [generate_input(answer, context) 
                     for answer, context in zip(answers, contexts)]
-        targets = [question if len(question) > 0 else "" for question in questions]
+        targets = [question for question in questions]
         return inputs, targets
 
     def preprocess_function(examples):
@@ -546,7 +559,7 @@ def main():
         for i in range(len(model_inputs["input_ids"])):
             # One example can give several spans, this is the index of the example containing this span of text.
             sample_index = sample_mapping[i]
-            model_inputs["example_id"].append(examples["id"][sample_index])
+            model_inputs["example_id"].append(examples["paragraph_id"][sample_index])
             labels_out.append(labels["input_ids"][sample_index])
 
         model_inputs["labels"] = labels_out
@@ -648,14 +661,14 @@ def main():
         decoded_preds = tokenizer.batch_decode(preds, skip_special_tokens=True)
 
         # Build a map example to its corresponding features.
-        example_id_to_index = {k: i for i, k in enumerate(examples["id"])}
+        example_id_to_index = {k: i for i, k in enumerate(examples["paragraph_id"])}
         feature_per_example = {example_id_to_index[feature["example_id"]]: i for i, feature in enumerate(features)}
         predictions = {}
         # Let's loop over all the examples!
         for example_index, example in enumerate(examples):
             # This is the index of the feature associated to the current example.
             feature_index = feature_per_example[example_index]
-            predictions[example["id"]] = decoded_preds[feature_index]
+            predictions[example["paragraph_id"]] = decoded_preds[feature_index]
 
         # Format the result to the format the metric expects.
         if data_args.version_2_with_negative:
@@ -665,9 +678,9 @@ def main():
         else:
             formatted_predictions = [{"id": k, "prediction_text": v} for k, v in predictions.items()]
 
-        references = [{"id": ex["id"], "answers": ex[answer_column]} for ex in examples]
+        references = [{"id": ex["paragraph_id"], "answers": ex[answer_column]} for ex in examples]
         return EvalPrediction(predictions=formatted_predictions, label_ids=references)
-
+    
     # Initialize our Trainer
     trainer = QuestionAnsweringSeq2SeqTrainer(
         model=model,
