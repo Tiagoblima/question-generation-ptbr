@@ -7,25 +7,25 @@ import datasets as dts
 
 @click.command()
 @click.option("-m", "model_name", type=str)
-@click.option("-ds", "dataset_name", type=str)
+@click.option("-d", "dataset_name", type=str)
 @click.option("--metrics", type=str, default="sacrebleu")
 @click.option("--answer_column", type=str, default="answer")
 @click.option("--context_column", type=str, default="paragraph")
 @click.option("--question_column", type=str, default="question")
-@click.option("--eval_split", type=str, default="evaluation")
+@click.option("--split_name", type=str, default="validation")
 def main(model_name,
          dataset_name,
          metrics, 
          answer_column,
          context_column,
          question_column,
-         eval_split
+         split_name
          ):
 
     model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
     tokenizer = AutoTokenizer.from_pretrained(model_name)
 
-    eval_ds = dts.load_dataset(dataset_name, split=eval_split)
+    eval_ds = dts.load_dataset(dataset_name, split=split_name)
 
     metric_list = metrics.split(",")
 
