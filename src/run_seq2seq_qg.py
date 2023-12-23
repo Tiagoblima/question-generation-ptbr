@@ -44,7 +44,20 @@ from transformers import (
 from transformers.trainer_utils import EvalLoopOutput, EvalPrediction, get_last_checkpoint
 from transformers.utils import check_min_version, send_example_telemetry
 from transformers.utils.versions import require_version
+import json 
+import dataclasses
 
+class EnhancedJSONEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if dataclasses.is_dataclass(obj):
+            return dataclasses.asdict(obj)
+        #return super().default(obj)
+    
+def save_json(json_path, file_args): 
+    file_str = json.dumps(file_args, cls=EnhancedJSONEncoder)
+    file_json = json.loads(file_str) 
+    with open(json_path, "w") as f:
+        json.dump(file_json, f, indent=4)
 
 # Will error if the minimal version of Transformers is not installed. Remove at your own risks.
 check_min_version("4.33.0")
@@ -294,8 +307,27 @@ def main():
         # let's parse it to get our arguments.
         model_args, data_args, training_args = parser.parse_json_file(json_file=os.path.abspath(sys.argv[1]))
     else:
+       
         model_args, data_args, training_args = parser.parse_args_into_dataclasses()
+    
+    # Parse the command-line arguments
+    args = parser.parse_args()
 
+    # Create a dictionary with the configuration parameters
+    config_dict = {
+        "model_args": args[0].__dict__,
+        "data_training_args": args[1].__dict__,
+        "seq2seq_training_args": args[2].__dict__,
+    }
+
+    # Save the configuration to a JSON file
+    json_filename = "experiment_config.json"
+    with open(json_filename, "w") as json_file:
+        json.dump(config_dict, json_file)
+
+    print(f"Configuration saved to {json_filename}")
+
+    
     if model_args.use_auth_token is not None:
         warnings.warn("The `use_auth_token` argument is deprecated and will be removed in v4.34.", FutureWarning)
         if model_args.token is not None:
