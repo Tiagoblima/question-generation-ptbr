@@ -310,22 +310,22 @@ def main():
        
         model_args, data_args, training_args = parser.parse_args_into_dataclasses()
     
-    # Parse the command-line arguments
-    args = parser.parse_args()
+        # Parse the command-line arguments
+        args = parser.parse_args()
 
-    # Create a dictionary with the configuration parameters
-    config_dict = {
-        "model_args": args[0].__dict__,
-        "data_training_args": args[1].__dict__,
-        "seq2seq_training_args": args[2].__dict__,
-    }
+        # Create a dictionary with the configuration parameters
+        config_dict = {
+            "model": args[0].__dict__,
+            "data_training": args[1].__dict__,
+            "seq2seq_training": args[2].__dict__,
+        }
 
-    # Save the configuration to a JSON file
-    json_filename = "experiment_config.json"
-    with open(json_filename, "w") as json_file:
-        json.dump(config_dict, json_file)
+        # Save the configuration to a JSON file
+        json_filename = "experiment_config.json"
+        with open(json_filename, "w") as json_file:
+            json.dump(config_dict, json_file)
 
-    print(f"Configuration saved to {json_filename}")
+        print(f"Configuration saved to {json_filename}")
 
     
     if model_args.use_auth_token is not None:
