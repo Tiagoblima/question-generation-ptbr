@@ -314,16 +314,16 @@ def main():
         args = parser.parse_args()
 
         # Create a dictionary with the configuration parameters
-        config_dict = {
-            "model": args[0].__dict__,
-            "data_training": args[1].__dict__,
-            "seq2seq_training": args[2].__dict__,
-        }
+        # config_dict = {
+        #     "model": ,
+        #     "data_training": args[1].__dict__,
+        #     "seq2seq_training": args[2].__dict__,
+        # }
 
         # Save the configuration to a JSON file
         json_filename = "experiment_config.json"
         with open(json_filename, "w") as json_file:
-            json.dump(config_dict, json_file)
+            json.dump(args.__dict__, json_file)
 
         print(f"Configuration saved to {json_filename}")
 
