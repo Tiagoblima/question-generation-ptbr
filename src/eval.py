@@ -2,7 +2,7 @@ import evaluate
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 import click
 import datasets as dts
-
+import json
 
 
 @click.command()
@@ -62,7 +62,8 @@ def main(model_name,
             result_dict[metric_name] = metric_dict["score"]
         else:
             result_dict.update(metric_dict)
-
+    print(result_dict)
+    json.dump(result_dict, open('results.json', "w"), indent=4)
 
 if __name__ == "__main__":
     main()
