@@ -4,6 +4,7 @@ import click
 import datasets as dts
 import json
 import torch
+import numpy as np 
 
 @click.command()
 @click.option("-m", "model_name", type=str)
@@ -57,12 +58,15 @@ def main(model_name,
 
     predict_ds = eval_ds.map(predict, batch_size=batch_size, batched= batch_size > 1)
 
+    hypothesis = np.array(predict_ds["predicted"])
+    references = np.expand_dims(np.array(predict_ds[question_column]), axis=0)
+    
     result_dict = {}
     for metric_name in metric_list:
         metric = dts.load_metric(metric_name)
 
-        metric_dict = metric.compute(predictions=predict_ds["predicted"],
-                                      references=predict_ds[question_column])
+        metric_dict = metric.compute(predictions=,
+                                      references=[: None])
 
         if "score" in metric_dict:
             result_dict[metric_name] = metric_dict["score"]
