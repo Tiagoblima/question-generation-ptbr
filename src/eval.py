@@ -13,13 +13,15 @@ import torch
 @click.option("--context_column", type=str, default="paragraph")
 @click.option("--question_column", type=str, default="question")
 @click.option("--split_name", type=str, default="validation")
+@click.option("-bs", "--batch_size", type=int, default=32)
 def main(model_name,
          dataset_name,
          metrics, 
          answer_column,
          context_column,
          question_column,
-         split_name
+         split_name,
+         batch_size
          ):
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -53,7 +55,7 @@ def main(model_name,
         })
         return batch
 
-    predict_ds = eval_ds.map(predict)
+    predict_ds = eval_ds.map(predict, batch_size=batch_size, batched= batch_size > 1)
 
     result_dict = {}
     for metric_name in metric_list:
