@@ -41,7 +41,7 @@ def main(model_name,
 
         model_inputs = tokenizer(text_inputs,
                                   max_length=model.config.max_length, 
-                                  padding=True, truncation=True, return_tensors="py")
+                                  padding=True, truncation=True, return_tensors="pt")
         # Tokenize targets with text_target=...
 
         outputs_ids = model.generate(**model_inputs)
