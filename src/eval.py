@@ -3,7 +3,7 @@ from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 import click
 import datasets as dts
 import json
-
+import torch
 
 @click.command()
 @click.option("-m", "model_name", type=str)
@@ -22,7 +22,8 @@ def main(model_name,
          split_name
          ):
 
-    model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    model = AutoModelForSeq2SeqLM.from_pretrained(model_name).to(device)
     tokenizer = AutoTokenizer.from_pretrained(model_name)
 
     eval_ds = dts.load_dataset(dataset_name, split=split_name)
@@ -43,7 +44,8 @@ def main(model_name,
                                   max_length=model.config.max_length, 
                                   padding=True, truncation=True, return_tensors="pt")
         # Tokenize targets with text_target=...
-
+        for inps in model_inputs:
+            model_inputs[inps] =  model_inputs[inps].to(device)
         outputs_ids = model.generate(**model_inputs)
 
         batch.update({
