@@ -52,7 +52,7 @@ def main(model_name,
         outputs_ids = model.generate(**model_inputs)
 
         batch.update({
-            "predicted": tokenizer.batch_decode(outputs_ids)
+            "predicted": tokenizer.batch_decode(outputs_ids, skip_special_tokens=True)
         })
         return batch
 
