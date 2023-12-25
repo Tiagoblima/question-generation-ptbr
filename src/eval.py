@@ -59,7 +59,7 @@ def main(model_name,
     predict_ds = eval_ds.map(predict, batch_size=batch_size, batched= batch_size > 1)
 
     hypothesis = np.array(predict_ds["predicted"])
-    references = np.expand_dims(np.array(predict_ds[question_column]), axis=0)
+    references = np.expand_dims(np.array(predict_ds[question_column]), axis=1)
     
     result_dict = {}
     for metric_name in metric_list:
