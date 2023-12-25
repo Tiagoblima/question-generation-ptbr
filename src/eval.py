@@ -59,10 +59,10 @@ def main(model_name,
 
     result_dict = {}
     for metric_name in metric_list:
-        metric = evaluate.load(metric_name)
+        metric = dts.load_metric(metric_name)
 
-        metric_dict = metric.compute(predict_ds["predicted"],
-                                      predict_ds[question_column])
+        metric_dict = metric.compute(predictions=predict_ds["predicted"],
+                                      references=predict_ds[question_column])
 
         if "score" in metric_dict:
             result_dict[metric_name] = metric_dict["score"]
