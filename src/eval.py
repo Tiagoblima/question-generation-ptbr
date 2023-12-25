@@ -74,9 +74,6 @@ def main(model_name,
             result_dict.update(metric_dict)
     print(result_dict)
     json.dump(result_dict, open('results.json', "w"), indent=4)
-    json.dump({
-        "hypothesis": hypothesis.tolist(),
-        "references": references.tolist()
-    }, open('predictions.json', "w"), indent=4)
+    json.dump(dict(zip(hypothesis.tolist(), references.tolist())), open('predictions.json', "w"), indent=4)
 if __name__ == "__main__":
     main()
