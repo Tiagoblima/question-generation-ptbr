@@ -307,6 +307,7 @@ def main():
         # let's parse it to get our arguments.
         model_args, data_args, training_args = parser.parse_json_file(json_file=os.path.abspath(sys.argv[1]))
         training_args.output_dir = os.path.join("/temp/", sys.argv[1].split("/")[-1].split(".")[0])
+        training_args.run_name = sys.argv[1].split("/")[-1].split(".")[0]
     else:
        
         model_args, data_args, training_args = parser.parse_args_into_dataclasses()
