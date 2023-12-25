@@ -65,8 +65,8 @@ def main(model_name,
     for metric_name in metric_list:
         metric = dts.load_metric(metric_name)
 
-        metric_dict = metric.compute(predictions=,
-                                      references=[: None])
+        metric_dict = metric.compute(predictions=hypothesis,
+                                      references=references)
 
         if "score" in metric_dict:
             result_dict[metric_name] = metric_dict["score"]
