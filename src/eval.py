@@ -75,8 +75,8 @@ def main(model_name,
     print(result_dict)
     json.dump(result_dict, open('results.json', "w"), indent=4)
     json.dump({
-        "hypothesis": hypothesis,
-        "references": references
+        "hypothesis": hypothesis.tolist(),
+        "references": references.tolist()
     }, open('predictions.json', "w"), indent=4)
 if __name__ == "__main__":
     main()
