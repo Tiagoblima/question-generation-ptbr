@@ -63,7 +63,7 @@ def main(model_name,
     
     result_dict = {}
     for metric_name in metric_list:
-        metric = dts.load_metric(metric_name)
+        metric = evaluate.load(metric_name)
 
         metric_dict = metric.compute(predictions=hypothesis,
                                       references=references)
