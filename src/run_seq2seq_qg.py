@@ -535,6 +535,7 @@ def main():
         questions = examples[question_column]
         
         def generate_input(example):
+            print(example)
             input_texts = [f"{name}:{example[name].lstrip()}" 
                            if len(model_args.input_names) > 1 else f"{example[name].lstrip()}"
                            for name in model_args.input_names]
