@@ -534,14 +534,14 @@ def main():
     ) -> Tuple[List[str], List[str]]:
         questions = examples[question_column]
         
-        def generate_input(example):
-            print(example)
-            input_texts = [f"{name}:{example[name].lstrip()}" 
-                           if len(model_args.input_names) > 1 else f"{example[name].lstrip()}"
-                           for name in model_args.input_names]
-            return " ".join(input_texts)
+        # def generate_input(example):
+        #     print(example)
+        #     input_texts = [f"{name}:{example[name].lstrip()}" 
+        #                    if len() > 1 else f"{example[name].lstrip()}"
+        #                    for name in model_args.input_names]
+        #     return " ".join(input_texts)
        
-        inputs = [generate_input(example) for example in examples]
+        inputs = [input_text for input_text in examples[model_args.input_names[0]]]
         targets = [question for question in questions]
         return inputs, targets
 
