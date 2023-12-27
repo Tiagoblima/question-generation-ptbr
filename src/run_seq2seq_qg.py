@@ -82,6 +82,9 @@ class ModelArguments:
     tokenizer_name: Optional[str] = field(
         default=None, metadata={"help": "Pretrained tokenizer name or path if not the same as model_name"}
     )
+    input_names: Optional[List[str]] = field(
+        default=None, metadata={"help": "Pretrained tokenizer name or path if not the same as model_name"}
+    )
     src_lang: Optional[str] = field(
         default=None, metadata={"help": "Source language required to models like mBart"}
     )
@@ -101,7 +104,7 @@ class ModelArguments:
         metadata={"help": "The specific model version to use (can be a branch name, tag name or commit id)."},
     )
     token: str = field(
-        default=None,
+        default=os.environ['HF_TOKEN'],
         metadata={
             "help": (
                 "The token to use as HTTP bearer authorization for remote files. If not specified, will use the token "
@@ -530,14 +533,14 @@ def main():
         answer_column: str,
     ) -> Tuple[List[str], List[str]]:
         questions = examples[question_column]
-        contexts = examples[context_column]
-        answers = examples[answer_column]
-
-        def generate_input(_answer, _context):
-            return " ".join(["answer:", _answer.lstrip(), "context:", _context.lstrip(), ])
+        
+        def generate_input(example):
+            input_texts = [f"{name}:{example[name].lstrip()}" 
+                           if len(model_args.input_names) > 1 else f"{example[name].lstrip()}"
+                           for name in model_args.input_names]
+            return " ".join(input_texts)
        
-        inputs = [generate_input(answer, context) 
-                    for answer, context in zip(answers, contexts)]
+        inputs = [generate_input(example) for example in examples]
         targets = [question for question in questions]
         return inputs, targets
 
