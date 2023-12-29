@@ -46,6 +46,8 @@ from transformers.utils import check_min_version, send_example_telemetry
 from transformers.utils.versions import require_version
 import json 
 import dataclasses
+import accelerate
+import peft
 
 class EnhancedJSONEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -318,13 +320,6 @@ def main():
         # Parse the command-line arguments
         args = parser.parse_args()
 
-        # Create a dictionary with the configuration parameters
-        # config_dict = {
-        #     "model": ,
-        #     "data_training": args[1].__dict__,
-        #     "seq2seq_training": args[2].__dict__,
-        # }
-
         # Save the configuration to a JSON file
         json_filename = "experiment_config.json"
         with open(json_filename, "w") as json_file:
@@ -436,6 +431,31 @@ def main():
         token=model_args.token,
         trust_remote_code=model_args.trust_remote_code,
     )
+
+    def print_trainable_parameters(model):
+        trainable_params = 0
+        all_param = 0
+        for _, param in model.named_parameters():
+            all_param += param.numel()
+            if param.requires_grad:
+                trainable_params += param.numel()
+        print(
+            f"trainable params: {trainable_params} || all params: {all_param} || trainable%: {100 * trainable_params / all_param:.2f}"
+        )
+
+    from peft import LoraConfig, get_peft_model
+
+    config = LoraConfig(
+        r=16,
+        lora_alpha=16,
+        target_modules=["q", "v"],
+        lora_dropout=0.1,
+        bias="none",
+        modules_to_save=["lm_head"],
+    )
+    lora_model = get_peft_model(model, config)
+    print_trainable_parameters(lora_model)
+
 
     kwargs = {
         "src_lang":model_args.src_lang,
@@ -713,7 +733,7 @@ def main():
     
     # Initialize our Trainer
     trainer = QuestionAnsweringSeq2SeqTrainer(
-        model=model,
+        model=lora_model,
         args=training_args,
         train_dataset=train_dataset if training_args.do_train else None,
         eval_dataset=eval_dataset if training_args.do_eval else None,
