@@ -46,8 +46,7 @@ from transformers.utils import check_min_version, send_example_telemetry
 from transformers.utils.versions import require_version
 import json 
 import dataclasses
-import accelerate
-import peft
+from peft import LoraConfig, get_peft_model
 
 class EnhancedJSONEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -476,7 +475,7 @@ def main():
             f"trainable params: {trainable_params} || all params: {all_param} || trainable%: {100 * trainable_params / all_param:.2f}"
         )
 
-    from peft import LoraConfig, get_peft_model
+    
 
     config = LoraConfig(
         task_type="SEQ_2_SEQ_LM",
@@ -747,7 +746,7 @@ def main():
     # Initialize our Trainer
     
     trainer = QuestionAnsweringSeq2SeqTrainer(
-        model=lora_model,
+        model=model,
         args=training_args,
         train_dataset=train_dataset if training_args.do_train else None,
         eval_dataset=eval_dataset if training_args.do_eval else None,
