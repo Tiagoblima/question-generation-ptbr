@@ -545,7 +545,7 @@ def main():
         )
     max_seq_length = min(data_args.max_seq_length, tokenizer.model_max_length)
 
-   def preprocess_squad_batch(
+    def preprocess_squad_batch(
         examples,
         question_column: str,
         context_column: str,
