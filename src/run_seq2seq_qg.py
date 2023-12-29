@@ -740,7 +740,7 @@ def main():
     
     # Initialize our Trainer
     trainer = QuestionAnsweringSeq2SeqTrainer(
-        model=lora_model,
+        model=model,
         args=training_args,
         train_dataset=train_dataset if training_args.do_train else None,
         eval_dataset=eval_dataset if training_args.do_eval else None,
