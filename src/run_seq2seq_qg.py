@@ -545,15 +545,23 @@ def main():
         )
     max_seq_length = min(data_args.max_seq_length, tokenizer.model_max_length)
 
-    def preprocess_squad_batch(
+   def preprocess_squad_batch(
         examples,
         question_column: str,
         context_column: str,
         answer_column: str,
     ) -> Tuple[List[str], List[str]]:
+        questions = examples[question_column]
         
+        # def generate_input(example):
+        #     print(example)
+        #     input_texts = [f"{name}:{example[name].lstrip()}" 
+        #                    if len() > 1 else f"{example[name].lstrip()}"
+        #                    for name in model_args.input_names]
+        #     return " ".join(input_texts)
+       
         inputs = [input_text for input_text in examples[model_args.input_names[0]]]
-        targets = examples[question_column]
+        targets = [question for question in questions]
         return inputs, targets
 
     def preprocess_function(examples):
