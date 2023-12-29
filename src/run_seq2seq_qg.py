@@ -475,8 +475,6 @@ def main():
             f"trainable params: {trainable_params} || all params: {all_param} || trainable%: {100 * trainable_params / all_param:.2f}"
         )
 
-    
-
     config = LoraConfig(
         task_type="SEQ_2_SEQ_LM",
         r=16,
