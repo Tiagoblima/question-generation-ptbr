@@ -532,17 +532,9 @@ def main():
         context_column: str,
         answer_column: str,
     ) -> Tuple[List[str], List[str]]:
-        questions = examples[question_column]
         
-        # def generate_input(example):
-        #     print(example)
-        #     input_texts = [f"{name}:{example[name].lstrip()}" 
-        #                    if len() > 1 else f"{example[name].lstrip()}"
-        #                    for name in model_args.input_names]
-        #     return " ".join(input_texts)
-       
         inputs = [input_text for input_text in examples[model_args.input_names[0]]]
-        targets = [question for question in questions]
+        targets = examples[question_column]
         return inputs, targets
 
     def preprocess_function(examples):
