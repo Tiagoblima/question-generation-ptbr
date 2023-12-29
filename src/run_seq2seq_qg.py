@@ -479,6 +479,7 @@ def main():
     from peft import LoraConfig, get_peft_model
 
     config = LoraConfig(
+        task_type="SEQ_2_SEQ_LM",
         r=16,
         lora_alpha=16,
         target_modules=["q", "v"],
@@ -738,15 +739,15 @@ def main():
         references = [{"id": ex["paragraph_id"], "answers": ex[answer_column]} for ex in examples]
         return EvalPrediction(predictions=formatted_predictions, label_ids=references)
     
-    from peft import LoftQConfig, LoraConfig, get_peft_model
-    loftq_config = LoftQConfig(loftq_bits=4)           # set 4bit quantization
-    lora_config = LoraConfig(init_lora_weights="loftq", loftq_config=loftq_config)
-    peft_model = get_peft_model(model, lora_config)
+    # from peft import LoftQConfig, LoraConfig, get_peft_model
+    # loftq_config = LoftQConfig(loftq_bits=4)           # set 4bit quantization
+    # lora_config = LoraConfig(init_lora_weights="loftq", loftq_config=loftq_config)
+    # peft_model = get_peft_model(model, lora_config)
 
     # Initialize our Trainer
-    print(train_dataset)
+    
     trainer = QuestionAnsweringSeq2SeqTrainer(
-        model=peft_model,
+        model=lora_model,
         args=training_args,
         train_dataset=train_dataset if training_args.do_train else None,
         eval_dataset=eval_dataset if training_args.do_eval else None,
