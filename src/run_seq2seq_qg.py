@@ -432,31 +432,6 @@ def main():
         trust_remote_code=model_args.trust_remote_code,
     )
 
-    def print_trainable_parameters(model):
-        trainable_params = 0
-        all_param = 0
-        for _, param in model.named_parameters():
-            all_param += param.numel()
-            if param.requires_grad:
-                trainable_params += param.numel()
-        print(
-            f"trainable params: {trainable_params} || all params: {all_param} || trainable%: {100 * trainable_params / all_param:.2f}"
-        )
-
-    from peft import LoraConfig, get_peft_model
-
-    config = LoraConfig(
-        r=16,
-        lora_alpha=16,
-        target_modules=["q", "v"],
-        lora_dropout=0.1,
-        bias="none",
-        modules_to_save=["lm_head"],
-    )
-    lora_model = get_peft_model(model, config)
-    print_trainable_parameters(lora_model)
-
-
     kwargs = {
         "src_lang":model_args.src_lang,
         "tgt_lang": model_args.tgt_lang
@@ -489,6 +464,30 @@ def main():
 
     if model.config.decoder_start_token_id is None:
         raise ValueError("Make sure that `config.decoder_start_token_id` is correctly defined")
+
+    def print_trainable_parameters(model):
+        trainable_params = 0
+        all_param = 0
+        for _, param in model.named_parameters():
+            all_param += param.numel()
+            if param.requires_grad:
+                trainable_params += param.numel()
+        print(
+            f"trainable params: {trainable_params} || all params: {all_param} || trainable%: {100 * trainable_params / all_param:.2f}"
+        )
+
+    from peft import LoraConfig, get_peft_model
+
+    config = LoraConfig(
+        r=16,
+        lora_alpha=16,
+        target_modules=["q", "v"],
+        lora_dropout=0.1,
+        bias="none",
+        modules_to_save=["lm_head"],
+    )
+    lora_model = get_peft_model(model, config)
+    print_trainable_parameters(lora_model)
 
     # Preprocessing the datasets.
     # We need to generate and tokenize inputs and targets.
