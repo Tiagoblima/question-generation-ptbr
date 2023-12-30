@@ -46,7 +46,7 @@ from transformers.utils import check_min_version, send_example_telemetry
 from transformers.utils.versions import require_version
 import json 
 import dataclasses
-
+from peft import LoraConfig, get_peft_model 
 
 class EnhancedJSONEncoder(json.JSONEncoder):
     def default(self, obj):
