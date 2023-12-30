@@ -345,7 +345,7 @@ def main():
             modules_to_save=["lm_head"],
         )
         with open("peft_config.json", "w") as json_file:
-            json.dump(config.__dict__, json_file, cls=EnhancedJSONEncoder)
+            json.dump(config.__dict__, json_file, indent=4, cls=EnhancedJSONEncoder)
 
     if model_args.use_auth_token is not None:
         warnings.warn("The `use_auth_token` argument is deprecated and will be removed in v4.34.", FutureWarning)
