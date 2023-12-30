@@ -114,7 +114,7 @@
     "fp16_opt_level": "O1",
     "half_precision_backend": "auto",
     "bf16_full_eval": false,
-    "fp16_full_eval": false,
+    "fp16_full_eval": true,
     "tf32": null,
     "local_rank": -1,
     "ddp_backend": null,
