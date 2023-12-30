@@ -5,6 +5,7 @@
     "src_lang": "",
     "tgt_lang": "",
     "cache_dir": null,
+    "load_in_8bit": true,
     "peft_train": true,
     "peft_config": {
         "peft_type": "LORA",
@@ -13,13 +14,13 @@
         "revision": null,
         "task_type": "SEQ_2_SEQ_LM",
         "inference_mode": false,
-        "r": 16,
+        "r": 8,
         "target_modules": [
             "q",
             "v"
         ],
-        "lora_alpha": 16,
-        "lora_dropout": 0.1,
+        "lora_alpha": 32,
+        "lora_dropout": 0.01,
         "fan_in_fan_out": false,
         "bias": "none",
         "modules_to_save": [
@@ -138,7 +139,7 @@
     "fsdp_transformer_layer_cls_to_wrap": null,
     "deepspeed": null,
     "label_smoothing_factor": 0.0,
-    "optim": "adamw_torch",
+    "optim": "adamw_bnb_8bit",
     "optim_args": null,
     "adafactor": false,
     "group_by_length": false,
