@@ -5,6 +5,35 @@
     "src_lang": "",
     "tgt_lang": "",
     "cache_dir": null,
+    "peft_train": true,
+    "peft_config": {
+        "peft_type": "LORA",
+        "auto_mapping": null,
+        "base_model_name_or_path": null,
+        "revision": null,
+        "task_type": "SEQ_2_SEQ_LM",
+        "inference_mode": false,
+        "r": 16,
+        "target_modules": [
+            "q",
+            "v"
+        ],
+        "lora_alpha": 16,
+        "lora_dropout": 0.1,
+        "fan_in_fan_out": false,
+        "bias": "none",
+        "modules_to_save": [
+            "lm_head"
+        ],
+        "init_lora_weights": true,
+        "layers_to_transform": null,
+        "layers_pattern": null,
+        "rank_pattern": {},
+        "alpha_pattern": {},
+        "megatron_config": null,
+        "megatron_core": "megatron.core",
+        "loftq_config": {}
+    },
     "use_fast_tokenizer": true,
     "model_revision": "main",
     "token": null,
