@@ -52,7 +52,9 @@ class EnhancedJSONEncoder(json.JSONEncoder):
     def default(self, obj):
         if dataclasses.is_dataclass(obj):
             return dataclasses.asdict(obj)
-        #return super().default(obj)
+        elif isinstance(set, obj):
+            return list(obj)
+        return super().default(obj)
     
 def save_json(json_path, file_args): 
     file_str = json.dumps(file_args, cls=EnhancedJSONEncoder)
@@ -343,7 +345,7 @@ def main():
             modules_to_save=["lm_head"],
         )
         with open("peft_config.json", "w") as json_file:
-            json.dump(config.__dict__, json_file)
+            json.dump(config.__dict__, json_file, cls=EnhancedJSONEncoder)
 
     if model_args.use_auth_token is not None:
         warnings.warn("The `use_auth_token` argument is deprecated and will be removed in v4.34.", FutureWarning)
