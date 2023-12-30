@@ -46,7 +46,7 @@ from transformers.utils import check_min_version, send_example_telemetry
 from transformers.utils.versions import require_version
 import json 
 import dataclasses
-from peft import LoraConfig, get_peft_model 
+from peft import LoraConfig, get_peft_model, prepare_model_for_int8_training
 
 class EnhancedJSONEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -78,6 +78,10 @@ class ModelArguments:
 
     model_name_or_path: str = field(
         metadata={"help": "Path to pretrained model or model identifier from huggingface.co/models"}
+    )
+    load_in_8bit: bool = field(
+        default=False,
+        metadata={"help": "Allow the train to run o 8bits mode"}
     )
     peft_train: bool = field(
         default=False,
@@ -115,7 +119,7 @@ class ModelArguments:
         metadata={"help": "The specific model version to use (can be a branch name, tag name or commit id)."},
     )
     token: str = field(
-        default=os.environ['HF_TOKEN'],
+        default=None,
         metadata={
             "help": (
                 "The token to use as HTTP bearer authorization for remote files. If not specified, will use the token "
@@ -731,6 +735,7 @@ def main():
         config = LoraConfig(
             **model_args.peft_config
         )
+        model = prepare_model_for_int8_training(model) if model_args.load_in_8bit else model
         peft_model = get_peft_model(model, config)
         print_trainable_parameters(peft_model)
 
@@ -742,6 +747,7 @@ def main():
         eval_examples=eval_examples if training_args.do_eval else None,
         tokenizer=tokenizer,
         data_collator=data_collator,
+        load_in_8bit = model_args.load_in_8bit,
         compute_metrics=compute_metrics if training_args.predict_with_generate else None,
         post_process_function=post_processing_function,
     )
