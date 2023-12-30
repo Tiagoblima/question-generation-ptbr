@@ -465,6 +465,7 @@ def main():
         cache_dir=model_args.cache_dir,
         revision=model_args.model_revision,
         token=model_args.token,
+        load_in_8bit = model_args.load_in_8bit,
         trust_remote_code=model_args.trust_remote_code,
     )
 
@@ -747,7 +748,6 @@ def main():
         eval_examples=eval_examples if training_args.do_eval else None,
         tokenizer=tokenizer,
         data_collator=data_collator,
-        load_in_8bit = model_args.load_in_8bit,
         compute_metrics=compute_metrics if training_args.predict_with_generate else None,
         post_process_function=post_processing_function,
     )
