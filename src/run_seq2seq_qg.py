@@ -716,9 +716,26 @@ def main():
         return EvalPrediction(predictions=formatted_predictions, label_ids=references)
     
     # Initialize our Trainer
-    
+    if model_args.peft_train:
+        print("Initializing Peft Model")
+        def print_trainable_parameters(model):
+            trainable_params = 0
+            all_param = 0
+            for _, param in model.named_parameters():
+                all_param += param.numel()
+                if param.requires_grad:
+                    trainable_params += param.numel()
+            print(
+                f"trainable params: {trainable_params} || all params: {all_param} || trainable%: {100 * trainable_params / all_param:.2f}"
+            )
+        config = LoraConfig(
+            **model_args.peft_config
+        )
+        peft_model = get_peft_model(model, config)
+        print_trainable_parameters(peft_model)
+
     trainer = QuestionAnsweringSeq2SeqTrainer(
-        model=model,
+        model=peft_model if model_args.peft_train else model,
         args=training_args,
         train_dataset=train_dataset if training_args.do_train else None,
         eval_dataset=eval_dataset if training_args.do_eval else None,
