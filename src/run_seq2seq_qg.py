@@ -24,9 +24,6 @@ import sys
 import warnings
 from dataclasses import dataclass, field
 from typing import List, Optional, Tuple
-import torch
-torch.backends.cuda.matmul.allow_tf32 = True
-torch.backends.cudnn.allow_tf32 = True
 
 import datasets
 import evaluate
