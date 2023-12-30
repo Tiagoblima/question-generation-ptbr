@@ -332,21 +332,10 @@ def main():
         # Save the configuration to a JSON file
         json_filename = "experiment_config.json"
         with open(json_filename, "w") as json_file:
-            json.dump(args.__dict__, json_file)
+            json.dump(args.__dict__, json_file, indent=4)
 
         print(f"Configuration saved to {json_filename}")
-        config = LoraConfig(
-            task_type="SEQ_2_SEQ_LM",
-            r=16,
-            lora_alpha=16,
-            target_modules=["q", "v"],
-            lora_dropout=0.1,
-            bias="none",
-            modules_to_save=["lm_head"],
-        )
-        with open("peft_config.json", "w") as json_file:
-            json.dump(config.__dict__, json_file, indent=4, cls=EnhancedJSONEncoder)
-
+        
     if model_args.use_auth_token is not None:
         warnings.warn("The `use_auth_token` argument is deprecated and will be removed in v4.34.", FutureWarning)
         if model_args.token is not None:
