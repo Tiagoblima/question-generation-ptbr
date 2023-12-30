@@ -44,7 +44,21 @@ from transformers import (
 from transformers.trainer_utils import EvalLoopOutput, EvalPrediction, get_last_checkpoint
 from transformers.utils import check_min_version, send_example_telemetry
 from transformers.utils.versions import require_version
+import json 
+import dataclasses
 
+
+class EnhancedJSONEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if dataclasses.is_dataclass(obj):
+            return dataclasses.asdict(obj)
+        #return super().default(obj)
+    
+def save_json(json_path, file_args): 
+    file_str = json.dumps(file_args, cls=EnhancedJSONEncoder)
+    file_json = json.loads(file_str) 
+    with open(json_path, "w") as f:
+        json.dump(file_json, f, indent=4)
 
 # Will error if the minimal version of Transformers is not installed. Remove at your own risks.
 check_min_version("4.33.0")
@@ -69,6 +83,9 @@ class ModelArguments:
     tokenizer_name: Optional[str] = field(
         default=None, metadata={"help": "Pretrained tokenizer name or path if not the same as model_name"}
     )
+    input_names: Optional[List[str]] = field(
+        default=None, metadata={"help": "Pretrained tokenizer name or path if not the same as model_name"}
+    )
     src_lang: Optional[str] = field(
         default=None, metadata={"help": "Source language required to models like mBart"}
     )
@@ -88,7 +105,7 @@ class ModelArguments:
         metadata={"help": "The specific model version to use (can be a branch name, tag name or commit id)."},
     )
     token: str = field(
-        default=None,
+        default=os.environ['HF_TOKEN'],
         metadata={
             "help": (
                 "The token to use as HTTP bearer authorization for remote files. If not specified, will use the token "
@@ -288,14 +305,28 @@ def main():
     # or by passing the --help flag to this script.
     # We now keep distinct sets of args, for a cleaner separation of concerns.
 
-    parser = HfArgumentParser((ModelArguments, DataTrainingArguments, Seq2SeqTrainingArguments))
+    parser = HfArgumentParser((ModelArguments, DataTrainingArguments, Seq2SeqTrainingArguments, LoraConfig))
     if len(sys.argv) == 2 and sys.argv[1].endswith(".json"):
         # If we pass only one argument to the script and it's the path to a json file,
         # let's parse it to get our arguments.
         model_args, data_args, training_args = parser.parse_json_file(json_file=os.path.abspath(sys.argv[1]))
+        training_args.output_dir = os.path.join("/temp/", sys.argv[1].split("/")[-1].split(".")[0])
+        training_args.run_name = sys.argv[1].split("/")[-1].split(".")[0]
     else:
+       
         model_args, data_args, training_args = parser.parse_args_into_dataclasses()
+    
+        # Parse the command-line arguments
+        args = parser.parse_args()
 
+        # Save the configuration to a JSON file
+        json_filename = "experiment_config.json"
+        with open(json_filename, "w") as json_file:
+            json.dump(args.__dict__, json_file)
+
+        print(f"Configuration saved to {json_filename}")
+
+    
     if model_args.use_auth_token is not None:
         warnings.warn("The `use_auth_token` argument is deprecated and will be removed in v4.34.", FutureWarning)
         if model_args.token is not None:
@@ -496,15 +527,9 @@ def main():
         answer_column: str,
     ) -> Tuple[List[str], List[str]]:
         questions = examples[question_column]
-        contexts = examples[context_column]
-        answers = examples[answer_column]
-
-        def generate_input(_answer, _context):
-            return " ".join(["answer:", _answer.lstrip(), "context:", _context.lstrip(), ])
-       
-        inputs = [generate_input(answer, context) 
-                    for answer, context in zip(answers, contexts)]
-        targets = [question for question in questions]
+        
+        inputs = examples[model_args.input_names[0]]
+        targets = questions
         return inputs, targets
 
     def preprocess_function(examples):
@@ -682,6 +707,7 @@ def main():
         return EvalPrediction(predictions=formatted_predictions, label_ids=references)
     
     # Initialize our Trainer
+    
     trainer = QuestionAnsweringSeq2SeqTrainer(
         model=model,
         args=training_args,
