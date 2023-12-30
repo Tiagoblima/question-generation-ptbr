@@ -78,9 +78,11 @@ class ModelArguments:
         metadata={"help": "Path to pretrained model or model identifier from huggingface.co/models"}
     )
     peft_train: bool = field(
+        default=False,
         metadata={"help": "Allow the train to run o peft mode"}
     )
-    peft_config: dict = field(
+    peft_config: Optional[dict] = field(
+        default=None,
         metadata={"help": "Peft configuration"}
     )
     config_name: Optional[str] = field(
