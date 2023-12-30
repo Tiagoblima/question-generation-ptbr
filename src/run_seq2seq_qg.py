@@ -77,6 +77,12 @@ class ModelArguments:
     model_name_or_path: str = field(
         metadata={"help": "Path to pretrained model or model identifier from huggingface.co/models"}
     )
+    peft_train: bool = field(
+        metadata={"help": "Allow the train to run o peft mode"}
+    )
+    peft_config: dict = field(
+        metadata={"help": "Peft configuration"}
+    )
     config_name: Optional[str] = field(
         default=None, metadata={"help": "Pretrained config name or path if not the same as model_name"}
     )
@@ -305,7 +311,7 @@ def main():
     # or by passing the --help flag to this script.
     # We now keep distinct sets of args, for a cleaner separation of concerns.
 
-    parser = HfArgumentParser((ModelArguments, DataTrainingArguments, Seq2SeqTrainingArguments, LoraConfig))
+    parser = HfArgumentParser((ModelArguments, DataTrainingArguments, Seq2SeqTrainingArguments))
     if len(sys.argv) == 2 and sys.argv[1].endswith(".json"):
         # If we pass only one argument to the script and it's the path to a json file,
         # let's parse it to get our arguments.
@@ -318,15 +324,25 @@ def main():
     
         # Parse the command-line arguments
         args = parser.parse_args()
-
+        
         # Save the configuration to a JSON file
         json_filename = "experiment_config.json"
         with open(json_filename, "w") as json_file:
             json.dump(args.__dict__, json_file)
 
         print(f"Configuration saved to {json_filename}")
+        config = LoraConfig(
+            task_type="SEQ_2_SEQ_LM",
+            r=16,
+            lora_alpha=16,
+            target_modules=["q", "v"],
+            lora_dropout=0.1,
+            bias="none",
+            modules_to_save=["lm_head"],
+        )
+        with open("peft_config.json", "w") as json_file:
+            json.dump(config.__dict__, json_file)
 
-    
     if model_args.use_auth_token is not None:
         warnings.warn("The `use_auth_token` argument is deprecated and will be removed in v4.34.", FutureWarning)
         if model_args.token is not None:
