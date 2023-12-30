@@ -46,7 +46,7 @@ from transformers.utils import check_min_version, send_example_telemetry
 from transformers.utils.versions import require_version
 import json 
 import dataclasses
-from peft import LoraConfig, get_peft_model
+
 
 class EnhancedJSONEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -305,7 +305,7 @@ def main():
     # or by passing the --help flag to this script.
     # We now keep distinct sets of args, for a cleaner separation of concerns.
 
-    parser = HfArgumentParser((ModelArguments, DataTrainingArguments, Seq2SeqTrainingArguments))
+    parser = HfArgumentParser((ModelArguments, DataTrainingArguments, Seq2SeqTrainingArguments, LoraConfig))
     if len(sys.argv) == 2 and sys.argv[1].endswith(".json"):
         # If we pass only one argument to the script and it's the path to a json file,
         # let's parse it to get our arguments.
@@ -464,29 +464,6 @@ def main():
     if model.config.decoder_start_token_id is None:
         raise ValueError("Make sure that `config.decoder_start_token_id` is correctly defined")
 
-    def print_trainable_parameters(model):
-        trainable_params = 0
-        all_param = 0
-        for _, param in model.named_parameters():
-            all_param += param.numel()
-            if param.requires_grad:
-                trainable_params += param.numel()
-        print(
-            f"trainable params: {trainable_params} || all params: {all_param} || trainable%: {100 * trainable_params / all_param:.2f}"
-        )
-
-    config = LoraConfig(
-        task_type="SEQ_2_SEQ_LM",
-        r=16,
-        lora_alpha=16,
-        target_modules=["q", "v"],
-        lora_dropout=0.1,
-        bias="none",
-        modules_to_save=["lm_head"],
-    )
-    lora_model = get_peft_model(model, config)
-    print_trainable_parameters(lora_model)
-
     # Preprocessing the datasets.
     # We need to generate and tokenize inputs and targets.
     if training_args.do_train:
@@ -551,15 +528,8 @@ def main():
     ) -> Tuple[List[str], List[str]]:
         questions = examples[question_column]
         
-        # def generate_input(example):
-        #     print(example)
-        #     input_texts = [f"{name}:{example[name].lstrip()}" 
-        #                    if len() > 1 else f"{example[name].lstrip()}"
-        #                    for name in model_args.input_names]
-        #     return " ".join(input_texts)
-       
-        inputs = [input_text for input_text in examples[model_args.input_names[0]]]
-        targets = [question for question in questions]
+        inputs = examples[model_args.input_names[0]]
+        targets = questions
         return inputs, targets
 
     def preprocess_function(examples):
@@ -736,11 +706,6 @@ def main():
         references = [{"id": ex["paragraph_id"], "answers": ex[answer_column]} for ex in examples]
         return EvalPrediction(predictions=formatted_predictions, label_ids=references)
     
-    # from peft import LoftQConfig, LoraConfig, get_peft_model
-    # loftq_config = LoftQConfig(loftq_bits=4)           # set 4bit quantization
-    # lora_config = LoraConfig(init_lora_weights="loftq", loftq_config=loftq_config)
-    # peft_model = get_peft_model(model, lora_config)
-
     # Initialize our Trainer
     
     trainer = QuestionAnsweringSeq2SeqTrainer(
