@@ -30,7 +30,7 @@ import evaluate
 import numpy as np
 from datasets import load_dataset
 from trainer_seq2seq_qg import QuestionAnsweringSeq2SeqTrainer
-
+import torch_xla.distributed.xla_multiprocessing as xmp
 import transformers
 from transformers import (
     AutoConfig,
@@ -823,4 +823,4 @@ def _mp_fn(index):
 
 
 if __name__ == "__main__":
-    main()
+   xmp.spawn(_mp_fn, args=(), nprocs=8, start_method='fork')
