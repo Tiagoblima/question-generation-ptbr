@@ -11,3 +11,4 @@ spacy
 nltk
 wandb
 sacrebleu>2.0.0
+bitsandbytes
