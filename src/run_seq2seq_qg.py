@@ -46,13 +46,15 @@ from transformers.utils import check_min_version, send_example_telemetry
 from transformers.utils.versions import require_version
 import json 
 import dataclasses
-
+from peft import LoraConfig, get_peft_model, prepare_model_for_int8_training
 
 class EnhancedJSONEncoder(json.JSONEncoder):
     def default(self, obj):
         if dataclasses.is_dataclass(obj):
             return dataclasses.asdict(obj)
-        #return super().default(obj)
+        elif isinstance(obj, (set)):
+            return list(obj)
+        return super().default(obj)
     
 def save_json(json_path, file_args): 
     file_str = json.dumps(file_args, cls=EnhancedJSONEncoder)
@@ -76,6 +78,18 @@ class ModelArguments:
 
     model_name_or_path: str = field(
         metadata={"help": "Path to pretrained model or model identifier from huggingface.co/models"}
+    )
+    load_in_8bit: bool = field(
+        default=False,
+        metadata={"help": "Allow the train to run o 8bits mode"}
+    )
+    peft_train: bool = field(
+        default=False,
+        metadata={"help": "Allow the train to run o peft mode"}
+    )
+    peft_config: Optional[dict] = field(
+        default=None,
+        metadata={"help": "Peft configuration"}
     )
     config_name: Optional[str] = field(
         default=None, metadata={"help": "Pretrained config name or path if not the same as model_name"}
@@ -105,7 +119,7 @@ class ModelArguments:
         metadata={"help": "The specific model version to use (can be a branch name, tag name or commit id)."},
     )
     token: str = field(
-        default=os.environ['HF_TOKEN'],
+        default=None,
         metadata={
             "help": (
                 "The token to use as HTTP bearer authorization for remote files. If not specified, will use the token "
@@ -305,7 +319,7 @@ def main():
     # or by passing the --help flag to this script.
     # We now keep distinct sets of args, for a cleaner separation of concerns.
 
-    parser = HfArgumentParser((ModelArguments, DataTrainingArguments, Seq2SeqTrainingArguments, LoraConfig))
+    parser = HfArgumentParser((ModelArguments, DataTrainingArguments, Seq2SeqTrainingArguments))
     if len(sys.argv) == 2 and sys.argv[1].endswith(".json"):
         # If we pass only one argument to the script and it's the path to a json file,
         # let's parse it to get our arguments.
@@ -318,15 +332,14 @@ def main():
     
         # Parse the command-line arguments
         args = parser.parse_args()
-
+        
         # Save the configuration to a JSON file
         json_filename = "experiment_config.json"
         with open(json_filename, "w") as json_file:
-            json.dump(args.__dict__, json_file)
+            json.dump(args.__dict__, json_file, indent=4)
 
         print(f"Configuration saved to {json_filename}")
-
-    
+        
     if model_args.use_auth_token is not None:
         warnings.warn("The `use_auth_token` argument is deprecated and will be removed in v4.34.", FutureWarning)
         if model_args.token is not None:
@@ -452,6 +465,7 @@ def main():
         cache_dir=model_args.cache_dir,
         revision=model_args.model_revision,
         token=model_args.token,
+        load_in_8bit = model_args.load_in_8bit,
         trust_remote_code=model_args.trust_remote_code,
     )
 
@@ -707,9 +721,27 @@ def main():
         return EvalPrediction(predictions=formatted_predictions, label_ids=references)
     
     # Initialize our Trainer
-    
+    if model_args.peft_train:
+        print("Initializing Peft Model")
+        def print_trainable_parameters(model):
+            trainable_params = 0
+            all_param = 0
+            for _, param in model.named_parameters():
+                all_param += param.numel()
+                if param.requires_grad:
+                    trainable_params += param.numel()
+            print(
+                f"trainable params: {trainable_params} || all params: {all_param} || trainable%: {100 * trainable_params / all_param:.2f}"
+            )
+        config = LoraConfig(
+            **model_args.peft_config
+        )
+        model = prepare_model_for_int8_training(model) if model_args.load_in_8bit else model
+        peft_model = get_peft_model(model, config)
+        print_trainable_parameters(peft_model)
+
     trainer = QuestionAnsweringSeq2SeqTrainer(
-        model=model,
+        model=peft_model if model_args.peft_train else model,
         args=training_args,
         train_dataset=train_dataset if training_args.do_train else None,
         eval_dataset=eval_dataset if training_args.do_eval else None,

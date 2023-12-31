@@ -5,9 +5,10 @@ peft==0.7.1
 evaluate
 sentencepiece 
 pandas
-datasets
 numpy==1.23.5
 spacy
 nltk
 wandb
 sacrebleu>2.0.0
+bitsandbytes
+torch_xla # For training Pytorch on TPU
