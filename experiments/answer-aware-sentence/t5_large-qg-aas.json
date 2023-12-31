@@ -78,7 +78,7 @@
     "gradient_accumulation_steps": 1,
     "eval_accumulation_steps": null,
     "eval_delay": 0,
-    "learning_rate": 0.0005,
+    "learning_rate": 0.0001,
     "weight_decay": 0.0,
     "adam_beta1": 0.9,
     "adam_beta2": 0.999,
