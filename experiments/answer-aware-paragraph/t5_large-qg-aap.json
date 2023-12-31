@@ -172,7 +172,7 @@
     "torchdynamo": null,
     "ray_scope": "last",
     "ddp_timeout": 1800,
-    "torch_compile": true,
+    "torch_compile": false,
     "torch_compile_backend": null,
     "torch_compile_mode": null,
     "dispatch_batches": null,
