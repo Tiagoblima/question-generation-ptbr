@@ -42,7 +42,7 @@ class QuestionAnsweringSeq2SeqTrainer(Seq2SeqTrainer):
         eval_dataset: Optional[Dataset] = None,
         eval_examples=None,
         ignore_keys: Optional[List[str]] = None,
-        metric_key_prefix: str = 'eval',
+        metric_key_prefix: Optional[str] = None,
         **gen_kwargs,
     ) -> Dict[str, float]:
         gen_kwargs = gen_kwargs.copy()
@@ -76,8 +76,8 @@ class QuestionAnsweringSeq2SeqTrainer(Seq2SeqTrainer):
         finally:
             self.compute_metrics = compute_metrics
         total_batch_size = self.args.eval_batch_size * self.args.world_size
-        if f"{metric_key_prefix}_jit_compilation_time" in output.metrics:
-
+        metric_str = f"{metric_key_prefix}_jit_compilation_time" if metric_key_prefix else  f"{metric_key_prefix}_jit_compilation_time"
+        if metric_str in output.metrics:
             start_time += output.metrics[f"{metric_key_prefix}_jit_compilation_time"]
         output.metrics.update(
             speed_metrics(
@@ -95,7 +95,7 @@ class QuestionAnsweringSeq2SeqTrainer(Seq2SeqTrainer):
 
             # Prefix all keys with metric_key_prefix + '_'
             for key in list(metrics.keys()):
-                if not key.startswith(f"{metric_key_prefix}_"):
+                if not key.startswith(f"{metric_key_prefix}_") and metric_key_prefix:
                     metrics[f"{metric_key_prefix}_{key}"] = metrics.pop(key)
 
             metrics.update(output.metrics)
