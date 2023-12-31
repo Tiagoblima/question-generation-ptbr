@@ -65,7 +65,7 @@
     "num_beams": null,
     "ignore_pad_token_for_loss": true,
     "output_dir": "/tmp/qg-t5-small/",
-    "overwrite_output_dir": false,
+    "overwrite_output_dir": true,
     "do_train": true,
     "do_eval": true,
     "do_predict": false,
