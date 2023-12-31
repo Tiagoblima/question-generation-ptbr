@@ -30,11 +30,11 @@ import evaluate
 import numpy as np
 from datasets import load_dataset
 from trainer_seq2seq_qg import QuestionAnsweringSeq2SeqTrainer
-import torch_xla.distributed.xla_multiprocessing as xmp
 import transformers
+import torch_xla.distributed.xla_multiprocessing as xmp
 from transformers import (
     AutoConfig,
-    AutoModelForSeq2SeqLM,
+    TFAutoModelForSeq2SeqLM,
     AutoTokenizer,
     DataCollatorForSeq2Seq,
     HfArgumentParser,
@@ -458,7 +458,7 @@ def main():
         trust_remote_code=model_args.trust_remote_code,
         **kwargs
     )
-    model = AutoModelForSeq2SeqLM.from_pretrained(
+    model = TFAutoModelForSeq2SeqLM.from_pretrained(
         model_args.model_name_or_path,
         from_tf=bool(".ckpt" in model_args.model_name_or_path),
         config=config,
