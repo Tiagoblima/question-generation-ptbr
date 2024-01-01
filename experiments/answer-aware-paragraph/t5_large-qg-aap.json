@@ -180,7 +180,7 @@
     "include_tokens_per_second": false,
     "neftune_noise_alpha": null,
     "sortish_sampler": false,
-    "predict_with_generate": true,
+    "predict_with_generate": false,
     "generation_max_length": null,
     "generation_num_beams": null,
     "generation_config": null
