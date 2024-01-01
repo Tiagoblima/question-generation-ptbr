@@ -16,8 +16,8 @@
         "inference_mode": false,
         "r": 8,
         "target_modules": [
-            "q",
-            "v"
+            "q_proj",
+            "v_proj"
         ],
         "lora_alpha": 32,
         "lora_dropout": 0.01,
@@ -71,7 +71,7 @@
     "do_predict": false,
     "evaluation_strategy": "epoch",
     "prediction_loss_only": false,
-    "per_device_train_batch_size": 256,
+    "per_device_train_batch_size": 64,
     "per_device_eval_batch_size": 4,
     "per_gpu_train_batch_size": null,
     "per_gpu_eval_batch_size": null,
