@@ -130,7 +130,7 @@
     "remove_unused_columns": true,
     "label_names": null,
     "load_best_model_at_end": true,
-    "metric_for_best_model": "sacrebleu",
+    "metric_for_best_model": null,
     "greater_is_better": null,
     "ignore_data_skip": false,
     "fsdp": "",
