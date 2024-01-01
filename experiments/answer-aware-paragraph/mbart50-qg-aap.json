@@ -16,8 +16,8 @@
         "inference_mode": false,
         "r": 8,
         "target_modules": [
-            "q",
-            "v"
+            "q_proj",
+            "v_proj"
         ],
         "lora_alpha": 32,
         "lora_dropout": 0.01,
