@@ -1,2 +1,6 @@
 
-python src/eval.py -m $1  -d tiagoblima/qg_squad_v1_pt
+MODEL=$1
+DATASET=$2
+METRICS=$3
+
+python src/eval.py -m $MODEL  -d $DATASET --metrics $METRICS
