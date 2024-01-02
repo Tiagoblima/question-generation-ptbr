@@ -6,6 +6,7 @@ import json
 import torch
 import numpy as np 
 
+
 @click.command()
 @click.option("-m", "model_name", type=str)
 @click.option("-d", "dataset_name", type=str)
@@ -15,6 +16,7 @@ import numpy as np
 @click.option("--question_column", type=str, default="question")
 @click.option("--split_name", type=str, default="validation")
 @click.option("-bs", "--batch_size", type=int, default=16)
+@click.option("--bs_model_type", type=str, default='neuralmind/bert-base-portuguese-cased')
 def main(model_name,
          dataset_name,
          metrics, 
@@ -22,7 +24,8 @@ def main(model_name,
          context_column,
          question_column,
          split_name,
-         batch_size
+         batch_size,
+         bs_model_type
          ):
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -64,6 +67,15 @@ def main(model_name,
     result_dict = {}
     for metric_name in metric_list:
         metric = evaluate.load(metric_name)
+
+        if metric_name == "bert_score":
+            results_scores = metric.compute(predictions=hypothesis, 
+                                        references=references.squeeze(), 
+                                        model_type=bs_model_type)
+            for key in results_scores:
+                results_scores[f"avg_{key}"] = np.array(results_scores.pop(key)).mean()
+
+            result_dict.update(results_scores)
 
         metric_dict = metric.compute(predictions=hypothesis,
                                       references=references)
