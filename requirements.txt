@@ -11,3 +11,6 @@ nltk
 wandb
 sacrebleu>2.0.0
 bitsandbytes
+bert-score
+nltk
+rouge_score

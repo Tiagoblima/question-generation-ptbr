@@ -14,7 +14,7 @@ import numpy as np
 @click.option("--context_column", type=str, default="paragraph")
 @click.option("--question_column", type=str, default="question")
 @click.option("--split_name", type=str, default="validation")
-@click.option("-bs", "--batch_size", type=int, default=32)
+@click.option("-bs", "--batch_size", type=int, default=16)
 def main(model_name,
          dataset_name,
          metrics, 
