@@ -32,7 +32,6 @@ def main(model_name,
 
     eval_ds = dts.load_dataset(dataset_name, split=split_name)
 
-  
     def predict(batch):
         
         text_inputs = batch[input_names[0]]
