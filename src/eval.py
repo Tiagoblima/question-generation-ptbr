@@ -18,7 +18,7 @@ import numpy as np
 @click.option("--bs_model_type", type=str, default='neuralmind/bert-base-portuguese-cased')
 def main(model_name,
          dataset_name,
-         metric_list, 
+         metrics, 
          input_name,
          target_name,
          split_name,
@@ -56,7 +56,7 @@ def main(model_name,
     references = np.expand_dims(np.array(predict_ds[target_name]), axis=1)
     
     result_dict = {}
-    for metric_name in metric_list.split(","):
+    for metric_name in metrics.split(","):
         metric = evaluate.load(metric_name)
 
         if metric_name == "bertscore":
