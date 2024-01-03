@@ -10,8 +10,8 @@ import numpy as np
 @click.command()
 @click.option("-m", "model_name", type=str)
 @click.option("-d", "dataset_name", type=str)
-@click.option("--metric_list", type=list, default=["sacrebleu"])
-@click.option("-i","--input_names", type=list, default=["paragraph_answer"])
+@click.option("--metrics", type=str, default="sacrebleu")
+@click.option("-i","--input_name", type=str, default="paragraph_answer")
 @click.option("-t","--target_name", type=str, default="question")
 @click.option("--split_name", type=str, default="validation")
 @click.option("-bs", "--batch_size", type=int, default=16)
@@ -19,7 +19,7 @@ import numpy as np
 def main(model_name,
          dataset_name,
          metric_list, 
-         input_names,
+         input_name,
          target_name,
          split_name,
          batch_size,
@@ -34,7 +34,7 @@ def main(model_name,
 
     def predict(batch):
         
-        text_inputs = batch[input_names[0]]
+        text_inputs = batch[input_name]
         
 
         model_inputs = tokenizer(text_inputs,
@@ -56,7 +56,7 @@ def main(model_name,
     references = np.expand_dims(np.array(predict_ds[target_name]), axis=1)
     
     result_dict = {}
-    for metric_name in metric_list:
+    for metric_name in metric_list.split(","):
         metric = evaluate.load(metric_name)
 
         if metric_name == "bertscore":
