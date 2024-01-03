@@ -10,7 +10,7 @@ import numpy as np
 @click.command()
 @click.option("-m", "model_name", type=str)
 @click.option("-d", "dataset_name", type=str)
-@click.option("--metrics", type=list, default=["sacrebleu"])
+@click.option("--metric_list", type=list, default=["sacrebleu"])
 @click.option("-i","--input_names", type=list, default=["paragraph_answer"])
 @click.option("-t","--target_name", type=str, default="question")
 @click.option("--split_name", type=str, default="validation")
@@ -18,7 +18,7 @@ import numpy as np
 @click.option("--bs_model_type", type=str, default='neuralmind/bert-base-portuguese-cased')
 def main(model_name,
          dataset_name,
-         metrics, 
+         metric_list, 
          input_names,
          target_name,
          split_name,
@@ -32,8 +32,7 @@ def main(model_name,
 
     eval_ds = dts.load_dataset(dataset_name, split=split_name)
 
-    metric_list = metrics.split(",")
-
+  
     def predict(batch):
         
         text_inputs = batch[input_names[0]]
