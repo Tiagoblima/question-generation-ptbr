@@ -11,18 +11,16 @@ import numpy as np
 @click.option("-m", "model_name", type=str)
 @click.option("-d", "dataset_name", type=str)
 @click.option("--metrics", type=str, default="sacrebleu")
-@click.option("--answer_column", type=str, default="answer")
-@click.option("--context_column", type=str, default="paragraph")
-@click.option("--question_column", type=str, default="question")
-@click.option("--split_name", type=str, default="validation")
+@click.option("--input_names", type=str, default=["paragraph_answer"])
+@click.option("--target_name", type=str, default="question")
+@click.option("--split_name", type=list, default="validation")
 @click.option("-bs", "--batch_size", type=int, default=16)
 @click.option("--bs_model_type", type=str, default='neuralmind/bert-base-portuguese-cased')
 def main(model_name,
          dataset_name,
          metrics, 
-         answer_column,
-         context_column,
-         question_column,
+         input_names,
+         target_name,
          split_name,
          batch_size,
          bs_model_type
@@ -36,14 +34,9 @@ def main(model_name,
 
     metric_list = metrics.split(",")
 
-    def generate_input(_answer, _context):
-        return " ".join(["answer:", _answer.lstrip(), "context:", _context.lstrip(), ])
-       
-        
     def predict(batch):
         
-        text_inputs = [generate_input(answer, context) 
-                    for answer, context in zip(batch[answer_column], batch[context_column])]
+        text_inputs = batch[input_names[0]]
         
 
         model_inputs = tokenizer(text_inputs,
@@ -62,7 +55,7 @@ def main(model_name,
     predict_ds = eval_ds.map(predict, batch_size=batch_size, batched= batch_size > 1)
 
     hypothesis = np.array(predict_ds["predicted"])
-    references = np.expand_dims(np.array(predict_ds[question_column]), axis=1)
+    references = np.expand_dims(np.array(predict_ds[target_name]), axis=1)
     
     result_dict = {}
     for metric_name in metric_list:
