@@ -68,7 +68,7 @@ def main(model_name,
     for metric_name in metric_list:
         metric = evaluate.load(metric_name)
 
-        if metric_name == "bert_score":
+        if metric_name == "bertscore":
             results_scores = metric.compute(predictions=hypothesis, 
                                         references=references.squeeze(), 
                                         model_type=bs_model_type)
