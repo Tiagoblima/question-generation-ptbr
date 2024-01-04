@@ -65,7 +65,7 @@ def main(model_name,
                             
                             batch_size=batch_size,
                             batched= batch_size > 1, 
-                            num_proc=num_proc if device == "cpu" else None)
+                            num_proc=num_proc if device == "cpu" and num_proc > 1 else None)
 
     hypothesis = np.array(predict_ds["predicted"])
     references = np.expand_dims(np.array(predict_ds[target_name]), axis=1)
