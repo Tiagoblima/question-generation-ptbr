@@ -43,7 +43,8 @@ def main(model_name,
         # Tokenize targets with text_target=...
         for inps in model_inputs:
             model_inputs[inps] =  model_inputs[inps].to(device)
-        outputs_ids = model.generate(**model_inputs)
+        outputs_ids = model.generate(**model_inputs, num_beams=5,
+         max_new_tokens=96)
 
         batch.update({
             "predicted": tokenizer.batch_decode(outputs_ids, skip_special_tokens=True)
