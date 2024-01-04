@@ -11,14 +11,14 @@ import numpy as np
 @click.option("-m", "model_name", type=str)
 @click.option("-d", "dataset_name", type=str, default="tiagoblima/qg_squad_v1_pt")
 @click.option("--metrics", type=str, default="sacrebleu")
-@click.option("-i","--input_names", type=str, default="answer,paragraph")
+@click.option("-i","--input_names", type=str, default="answer")
 @click.option("-t","--target_name", type=str, default="question")
 @click.option("--split_name", type=str, default="validation")
 @click.option("-bs", "--batch_size", type=int, default=16)
 @click.option("-ml", "--max_new_tokens", type=int, default=96)
 @click.option("--num_beams", type=int, default=5)
-@click.option("--num_proc", type=int, default=5)
-@click.option("--bs_model_type", type=str, default='neuralmind/bert-base-portuguese-cased')
+@click.option("--num_proc", type=int, default=1)
+@click.option("--lang", type=str, default='pt')
 def main(model_name,
          dataset_name,
          metrics, 
@@ -29,7 +29,7 @@ def main(model_name,
          max_new_tokens,
          num_beams,
          num_proc,
-         bs_model_type
+         lang
          ):
     input_names = input_names.split(",")
     device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -45,10 +45,11 @@ def main(model_name,
     def predict(*text_inputs):
         
         text_inputs = [generate_input(example) for example in zip(*text_inputs)]
-        
+        print(text_inputs[:1])
         model_inputs = tokenizer(text_inputs,
                                   max_length=model.config.max_length, 
                                   padding=True, truncation=True, return_tensors="pt")
+        
         # Tokenize targets with text_target=...
         for inps in model_inputs:
             model_inputs[inps] =  model_inputs[inps].to(device)
@@ -74,7 +75,7 @@ def main(model_name,
         if metric_name == "bertscore":
             results_scores = metric.compute(predictions=hypothesis, 
                                         references=references.squeeze(), 
-                                        model_type=bs_model_type)
+                                        lang=lang)
             for key in results_scores:
                 results_scores[f"avg_{key}"] = np.array(results_scores.pop(key)).mean()
 
