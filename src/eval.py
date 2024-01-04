@@ -45,7 +45,7 @@ def main(model_name,
     def predict(*text_inputs):
         
         text_inputs = [generate_input(example) for example in zip(*text_inputs)]
-        print(text_inputs[:1])
+        
         model_inputs = tokenizer(text_inputs,
                                   max_length=model.config.max_length, 
                                   padding=True, truncation=True, return_tensors="pt")
