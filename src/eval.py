@@ -11,7 +11,7 @@ import numpy as np
 @click.option("-m", "model_name", type=str)
 @click.option("-d", "dataset_name", type=str, default="tiagoblima/qg_squad_v1_pt")
 @click.option("--metrics", type=str, default="sacrebleu")
-@click.option("-i","--input_names", type=str, default="answer")
+@click.option("-i","--input_names", type=str, default="answer,paragraph")
 @click.option("-t","--target_name", type=str, default="question")
 @click.option("--split_name", type=str, default="validation")
 @click.option("-bs", "--batch_size", type=int, default=16)
@@ -42,8 +42,10 @@ def main(model_name,
           
             return f"{tokenizer.eos_token}".join(tup_example)
 
-    def predict(*text_inputs):
+    def predict(examples):
         
+        text_inputs = [examples[input_name] 
+                            for input_name in input_names]
         text_inputs = [generate_input(example) for example in zip(*text_inputs)]
         
         model_inputs = tokenizer(text_inputs,
@@ -60,7 +62,7 @@ def main(model_name,
         }
 
     predict_ds = eval_ds.map(predict,
-                            input_columns=input_names,
+                            
                             batch_size=batch_size,
                             batched= batch_size > 1, 
                             num_proc=num_proc if device == "cpu" else None)
