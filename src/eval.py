@@ -34,7 +34,7 @@ def main(model_name,
     model = AutoModelForSeq2SeqLM.from_pretrained(model_name).to(device)
     tokenizer = AutoTokenizer.from_pretrained(model_name)
 
-    eval_ds = dts.load_dataset("tiagoblima/qg_squad_v1_pt", split=split_name)
+    eval_ds = dts.load_dataset(dataset_name, split=split_name)
 
     def generate_input(tup_example):
           
@@ -52,10 +52,9 @@ def main(model_name,
             model_inputs[inps] =  model_inputs[inps].to(device)
         outputs_ids = model.generate(**model_inputs, num_beams=num_beams, max_new_tokens=max_new_tokens)
 
-        batch.update({
+        return {
             "predicted": tokenizer.batch_decode(outputs_ids, skip_special_tokens=True)
-        })
-        return batch
+        }
 
     predict_ds = eval_ds.map(predict,
                             input_columns=input_names,
