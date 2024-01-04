@@ -17,6 +17,7 @@ import numpy as np
 @click.option("-bs", "--batch_size", type=int, default=16)
 @click.option("-ml", "--max_new_tokens", type=int, default=96)
 @click.option("--num_beams", type=int, default=5)
+@click.option("--num_proc", type=int, default=5)
 @click.option("--bs_model_type", type=str, default='neuralmind/bert-base-portuguese-cased')
 def main(model_name,
          dataset_name,
@@ -27,6 +28,7 @@ def main(model_name,
          batch_size,
          max_new_tokens,
          num_beams,
+         num_proc,
          bs_model_type
          ):
     input_names = input_names.split(",")
@@ -59,7 +61,8 @@ def main(model_name,
     predict_ds = eval_ds.map(predict,
                             input_columns=input_names,
                             batch_size=batch_size,
-                            batched= batch_size > 1)
+                            batched= batch_size > 1, 
+                            num_proc=num_proc if device == "cpu" else None)
 
     hypothesis = np.array(predict_ds["predicted"])
     references = np.expand_dims(np.array(predict_ds[target_name]), axis=1)
