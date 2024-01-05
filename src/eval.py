@@ -38,7 +38,7 @@ def main(model_name,
     model = AutoModelForSeq2SeqLM.from_pretrained(model_name).to(device)
     tokenizer = AutoTokenizer.from_pretrained(model_name)
 
-    eval_ds = dts.load_dataset(dataset_name, split=split_name)
+    eval_ds = dts.load_dataset(dataset_name, split=split_name).select(range(100))
 
     def generate_input(tup_example):
           
@@ -82,9 +82,11 @@ def main(model_name,
             bert_scores = metric.compute(predictions=hypothesis, 
                                         references=references.squeeze(), 
                                         lang=lang)
+            bert_scores.pop('hashcode') 
             for key in bert_scores:
                 result_dict[f"avg_{key}"] = np.array(bert_scores[key]).mean()
-
+            continue
+          
         metric_dict = metric.compute(predictions=hypothesis,
                                       references=references)
 
@@ -92,7 +94,8 @@ def main(model_name,
             result_dict[metric_name] = metric_dict["score"]
         else:
             result_dict.update(metric_dict)
-    output_dir = os.makedirs(os.path.join(output_dir, model_name), exist_ok=True)
+    output_dir = os.path.join(output_dir, model_name) 
+    os.makedirs(output_dir, exist_ok=True)
     json.dump(result_dict, open(f'{output_dir}/scores.json', "w"), indent=4)
     open(f'{output_dir}/hypothesis.txt', "w").writelines([hyp + "\n" for hyp in hypothesis])
 if __name__ == "__main__":
