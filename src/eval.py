@@ -79,13 +79,11 @@ def main(model_name,
         metric = evaluate.load(metric_name)
 
         if metric_name == "bertscore":
-            results_scores = metric.compute(predictions=hypothesis, 
+            bert_scores = metric.compute(predictions=hypothesis, 
                                         references=references.squeeze(), 
                                         lang=lang)
-            for key in results_scores:
-                results_scores[f"avg_{key}"] = np.array(results_scores.pop(key)).mean()
-
-            result_dict.update(results_scores)
+            for key in bert_scores:
+                result_dict[f"avg_{key}"] = np.array(bert_scores.pop(key)).mean()
 
         metric_dict = metric.compute(predictions=hypothesis,
                                       references=references)
