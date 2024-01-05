@@ -59,9 +59,11 @@ def main(model_name,
             model_inputs[inps] =  model_inputs[inps].to(device)
         outputs_ids = model.generate(**model_inputs, num_beams=num_beams, max_new_tokens=max_new_tokens)
 
-        return {
+        examples.update({
             "predicted": tokenizer.batch_decode(outputs_ids, skip_special_tokens=True)
-        }
+        })
+
+        return examples
 
     predict_ds = eval_ds.map(predict,
                             
