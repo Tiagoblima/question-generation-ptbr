@@ -83,7 +83,7 @@ def main(model_name,
                                         references=references.squeeze(), 
                                         lang=lang)
             for key in bert_scores:
-                result_dict[f"avg_{key}"] = np.array(bert_scores.pop(key)).mean()
+                result_dict[f"avg_{key}"] = np.array(bert_scores[key]).mean()
 
         metric_dict = metric.compute(predictions=hypothesis,
                                       references=references)
