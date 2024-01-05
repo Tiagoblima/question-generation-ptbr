@@ -5,14 +5,15 @@ import datasets as dts
 import json
 import torch
 import numpy as np 
-
+import os
 
 @click.command()
 @click.option("-m", "model_name", type=str)
 @click.option("-d", "dataset_name", type=str, default="tiagoblima/qg_squad_v1_pt")
-@click.option("--metrics", type=str, default="sacrebleu")
 @click.option("-i","--input_names", type=str, default="paragraph,answer")
+@click.option("-o","--output_dir", type=str, default="validation")
 @click.option("-t","--target_name", type=str, default="question")
+@click.option("--metrics", type=str, default="sacrebleu")
 @click.option("--split_name", type=str, default="validation")
 @click.option("-bs", "--batch_size", type=int, default=16)
 @click.option("-ml", "--max_new_tokens", type=int, default=96)
@@ -22,6 +23,7 @@ import numpy as np
 def main(model_name,
          dataset_name,
          metrics, 
+         output_dir,
          input_names,
          target_name,
          split_name,
@@ -90,8 +92,8 @@ def main(model_name,
             result_dict[metric_name] = metric_dict["score"]
         else:
             result_dict.update(metric_dict)
-    print(result_dict)
-    json.dump(result_dict, open('results.json', "w"), indent=4)
-    json.dump(dict(zip(hypothesis.tolist(), references.tolist())), open('predictions.json', "w"), indent=4)
+    output_dir = os.makedirs(os.path.join(output_dir, model_name), exist_ok=True)
+    json.dump(result_dict, open(f'{output_dir}/scores.json', "w"), indent=4)
+    open(f'{output_dir}/hypothesis.txt', "w").writelines([hyp + "\n" for hyp in hypothesis])
 if __name__ == "__main__":
     main()
