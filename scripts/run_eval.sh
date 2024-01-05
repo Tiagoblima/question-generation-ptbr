@@ -6,4 +6,4 @@ DATASET=tiagoblima/qg_squad_v1_pt
 python src/eval.py -m $MODEL \
                    -i $INPUT_NAME  \
                    -d $DATASET \
-                   --metrics "sacrebleu,rouge,meteor,ter,bert_score"
+                   --metrics "sacrebleu,rouge,meteor,ter,bertscore"
