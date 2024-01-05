@@ -68,7 +68,7 @@
     "overwrite_output_dir": true,
     "do_train": true,
     "do_eval": true,
-    "do_predict": true,
+    "do_predict": false,
     "evaluation_strategy": "steps",
     "prediction_loss_only": false,
     "per_device_train_batch_size": 64,
