@@ -11,7 +11,7 @@ import numpy as np
 @click.option("-m", "model_name", type=str)
 @click.option("-d", "dataset_name", type=str, default="tiagoblima/qg_squad_v1_pt")
 @click.option("--metrics", type=str, default="sacrebleu")
-@click.option("-i","--input_names", type=str, default="answer,paragraph")
+@click.option("-i","--input_names", type=str, default="paragraph,answer")
 @click.option("-t","--target_name", type=str, default="question")
 @click.option("--split_name", type=str, default="validation")
 @click.option("-bs", "--batch_size", type=int, default=16)
