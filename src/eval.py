@@ -38,7 +38,7 @@ def main(model_name,
     model = AutoModelForSeq2SeqLM.from_pretrained(model_name).to(device)
     tokenizer = AutoTokenizer.from_pretrained(model_name)
 
-    eval_ds = dts.load_dataset(dataset_name, split=split_name).select(range(100))
+    eval_ds = dts.load_dataset(dataset_name, split=split_name)
 
     def generate_input(tup_example):
           
