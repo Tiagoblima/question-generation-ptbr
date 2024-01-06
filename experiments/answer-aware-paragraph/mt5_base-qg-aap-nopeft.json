@@ -122,7 +122,7 @@
     "tpu_metrics_debug": false,
     "debug": null,
     "dataloader_drop_last": false,
-    "eval_steps": 500,
+    "eval_steps": 100,
     "dataloader_num_workers": 0,
     "past_index": -1,
     "run_name": "mbart-large",
