@@ -569,7 +569,7 @@ def main():
 
     # Validation preprocessing
     def preprocess_validation_function(examples):
-        inputs, targets = preprocess_squad_batch(examples, question_column, context_column, answer_column)
+        inputs, targets = preprocess_squad_batch(examples, question_column)
 
         model_inputs = tokenizer(
             inputs,
