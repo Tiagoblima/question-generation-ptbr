@@ -1,5 +1,5 @@
 {
-    "model_name_or_path": "google/mt5-base",
+    "model_name_or_path": "unicamp-dl/ptt5-base-t5-vocab",
     "config_name": null,
     "tokenizer_name": null,
     "src_lang": "",
