@@ -44,7 +44,23 @@ from transformers import (
 from transformers.trainer_utils import EvalLoopOutput, EvalPrediction, get_last_checkpoint
 from transformers.utils import check_min_version, send_example_telemetry
 from transformers.utils.versions import require_version
+import json 
+import dataclasses
+from peft import LoraConfig, get_peft_model, prepare_model_for_int8_training
 
+class EnhancedJSONEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if dataclasses.is_dataclass(obj):
+            return dataclasses.asdict(obj)
+        elif isinstance(obj, (set)):
+            return list(obj)
+        return super().default(obj)
+    
+def save_json(json_path, file_args): 
+    file_str = json.dumps(file_args, cls=EnhancedJSONEncoder)
+    file_json = json.loads(file_str) 
+    with open(json_path, "w") as f:
+        json.dump(file_json, f, indent=4)
 
 # Will error if the minimal version of Transformers is not installed. Remove at your own risks.
 check_min_version("4.33.0")
@@ -63,10 +79,25 @@ class ModelArguments:
     model_name_or_path: str = field(
         metadata={"help": "Path to pretrained model or model identifier from huggingface.co/models"}
     )
+    load_in_8bit: bool = field(
+        default=False,
+        metadata={"help": "Allow the train to run o 8bits mode"}
+    )
+    peft_train: bool = field(
+        default=False,
+        metadata={"help": "Allow the train to run o peft mode"}
+    )
+    peft_config: Optional[dict] = field(
+        default=None,
+        metadata={"help": "Peft configuration"}
+    )
     config_name: Optional[str] = field(
         default=None, metadata={"help": "Pretrained config name or path if not the same as model_name"}
     )
     tokenizer_name: Optional[str] = field(
+        default=None, metadata={"help": "Pretrained tokenizer name or path if not the same as model_name"}
+    )
+    input_names: Optional[List[str]] = field(
         default=None, metadata={"help": "Pretrained tokenizer name or path if not the same as model_name"}
     )
     src_lang: Optional[str] = field(
@@ -293,9 +324,22 @@ def main():
         # If we pass only one argument to the script and it's the path to a json file,
         # let's parse it to get our arguments.
         model_args, data_args, training_args = parser.parse_json_file(json_file=os.path.abspath(sys.argv[1]))
+        training_args.output_dir = os.path.join("/temp/", sys.argv[1].split("/")[-1].split(".")[0])
+        training_args.run_name = sys.argv[1].split("/")[-1].split(".")[0]
     else:
+       
         model_args, data_args, training_args = parser.parse_args_into_dataclasses()
+    
+        # Parse the command-line arguments
+        args = parser.parse_args()
+        
+        # Save the configuration to a JSON file
+        json_filename = "experiment_config.json"
+        with open(json_filename, "w") as json_file:
+            json.dump(args.__dict__, json_file, indent=4)
 
+        print(f"Configuration saved to {json_filename}")
+        
     if model_args.use_auth_token is not None:
         warnings.warn("The `use_auth_token` argument is deprecated and will be removed in v4.34.", FutureWarning)
         if model_args.token is not None:
@@ -421,6 +465,7 @@ def main():
         cache_dir=model_args.cache_dir,
         revision=model_args.model_revision,
         token=model_args.token,
+        load_in_8bit = model_args.load_in_8bit,
         trust_remote_code=model_args.trust_remote_code,
     )
 
@@ -492,23 +537,21 @@ def main():
     def preprocess_squad_batch(
         examples,
         question_column: str,
-        context_column: str,
-        answer_column: str,
-    ) -> Tuple[List[str], List[str]]:
-        questions = examples[question_column]
-        contexts = examples[context_column]
-        answers = examples[answer_column]
-
-        def generate_input(_answer, _context):
-            return " ".join(["answer:", _answer.lstrip(), "context:", _context.lstrip(), ])
        
-        inputs = [generate_input(answer, context) 
-                    for answer, context in zip(answers, contexts)]
-        targets = [question for question in questions]
+    ) -> Tuple[List[str], List[str]]:
+        text_inputs = [examples[input_name] 
+                            for input_name in model_args.input_names]
+        
+        def generate_input(tup_example):
+            return f"{tokenizer.eos_token}".join(tup_example)
+
+        text_inputs = [generate_input(example) for example in zip(*text_inputs)]
+        inputs = examples[model_args.input_names[0]]
+        targets = examples[question_column]
         return inputs, targets
 
     def preprocess_function(examples):
-        inputs, targets = preprocess_squad_batch(examples, question_column, context_column, answer_column)
+        inputs, targets = preprocess_squad_batch(examples, question_column)
 
         model_inputs = tokenizer(inputs, max_length=max_seq_length, padding=padding, truncation=True)
         # Tokenize targets with text_target=...
@@ -526,7 +569,7 @@ def main():
 
     # Validation preprocessing
     def preprocess_validation_function(examples):
-        inputs, targets = preprocess_squad_batch(examples, question_column, context_column, answer_column)
+        inputs, targets = preprocess_squad_batch(examples, question_column)
 
         model_inputs = tokenizer(
             inputs,
@@ -643,10 +686,12 @@ def main():
         pad_to_multiple_of=8 if training_args.fp16 else None,
     )
 
-    metric = evaluate.load("squad_v2" if data_args.version_2_with_negative else "squad")
+    metric = evaluate.load("sacrebleu" if data_args.version_2_with_negative else "squad")
 
     def compute_metrics(p: EvalPrediction):
-        return metric.compute(predictions=p.predictions, references=p.label_ids)
+        return {
+          "eval_sacrebleu": metric.compute(predictions=p.predictions, references=p.label_ids)["sacrebleu"]
+        }
 
     # Post-processing:
     def post_processing_function(
@@ -682,8 +727,27 @@ def main():
         return EvalPrediction(predictions=formatted_predictions, label_ids=references)
     
     # Initialize our Trainer
+    if model_args.peft_train:
+        print("Initializing Peft Model")
+        def print_trainable_parameters(model):
+            trainable_params = 0
+            all_param = 0
+            for _, param in model.named_parameters():
+                all_param += param.numel()
+                if param.requires_grad:
+                    trainable_params += param.numel()
+            print(
+                f"trainable params: {trainable_params} || all params: {all_param} || trainable%: {100 * trainable_params / all_param:.2f}"
+            )
+        config = LoraConfig(
+            **model_args.peft_config
+        )
+        model = prepare_model_for_int8_training(model) if model_args.load_in_8bit else model
+        peft_model = get_peft_model(model, config)
+        print_trainable_parameters(peft_model)
+
     trainer = QuestionAnsweringSeq2SeqTrainer(
-        model=model,
+        model=peft_model if model_args.peft_train else model,
         args=training_args,
         train_dataset=train_dataset if training_args.do_train else None,
         eval_dataset=eval_dataset if training_args.do_eval else None,

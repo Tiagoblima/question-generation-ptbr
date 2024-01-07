@@ -1,12 +1,16 @@
-accelerate >= 0.22.0
+accelerate==0.25.0
 datasets==2.15.0
-transformers
+transformers==4.35.2
+peft==0.7.1
 evaluate
 sentencepiece 
 pandas
-datasets
 numpy==1.23.5
 spacy
 nltk
 wandb
 sacrebleu>2.0.0
+bitsandbytes
+bert-score
+nltk==3.8.1
+rouge_score
