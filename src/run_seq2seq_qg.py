@@ -537,17 +537,21 @@ def main():
     def preprocess_squad_batch(
         examples,
         question_column: str,
-        context_column: str,
-        answer_column: str,
+       
     ) -> Tuple[List[str], List[str]]:
-        questions = examples[question_column]
+        text_inputs = [examples[input_name] 
+                            for input_name in model_args.input_names]
         
+        def generate_input(tup_example):
+            return f"{tokenizer.eos_token}".join(tup_example)
+
+        text_inputs = [generate_input(example) for example in zip(*text_inputs)]
         inputs = examples[model_args.input_names[0]]
-        targets = questions
+        targets = examples[question_column]
         return inputs, targets
 
     def preprocess_function(examples):
-        inputs, targets = preprocess_squad_batch(examples, question_column, context_column, answer_column)
+        inputs, targets = preprocess_squad_batch(examples, question_column)
 
         model_inputs = tokenizer(inputs, max_length=max_seq_length, padding=padding, truncation=True)
         # Tokenize targets with text_target=...
@@ -565,7 +569,7 @@ def main():
 
     # Validation preprocessing
     def preprocess_validation_function(examples):
-        inputs, targets = preprocess_squad_batch(examples, question_column, context_column, answer_column)
+        inputs, targets = preprocess_squad_batch(examples, question_column)
 
         model_inputs = tokenizer(
             inputs,
@@ -682,10 +686,12 @@ def main():
         pad_to_multiple_of=8 if training_args.fp16 else None,
     )
 
-    metric = evaluate.load("squad_v2" if data_args.version_2_with_negative else "squad")
+    metric = evaluate.load("sacrebleu" if data_args.version_2_with_negative else "squad")
 
     def compute_metrics(p: EvalPrediction):
-        return metric.compute(predictions=p.predictions, references=p.label_ids)
+        return {
+          "eval_sacrebleu": metric.compute(predictions=p.predictions, references=p.label_ids)["sacrebleu"]
+        }
 
     # Post-processing:
     def post_processing_function(
