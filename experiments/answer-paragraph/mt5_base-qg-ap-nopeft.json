@@ -109,7 +109,7 @@
     "data_seed": null,
     "jit_mode_eval": false,
     "use_ipex": false,
-    "bf16": false,
+    "bf16": true,
     "fp16": false,
     "fp16_opt_level": "O1",
     "half_precision_backend": "auto",
