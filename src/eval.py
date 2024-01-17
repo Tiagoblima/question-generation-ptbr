@@ -14,7 +14,7 @@ import os
 @click.option("-o","--output_dir", type=str, default="validation")
 @click.option("-t","--target_name", type=str, default="question")
 @click.option("--metrics", type=str, default="sacrebleu")
-@click.option("--split_name", type=str, default="validation")
+@click.option("--split_name", type=str, default="test")
 @click.option("-bs", "--batch_size", type=int, default=16)
 @click.option("-ml", "--max_new_tokens", type=int, default=96)
 @click.option("--num_beams", type=int, default=5)
@@ -38,7 +38,7 @@ def main(model_name,
     model = AutoModelForSeq2SeqLM.from_pretrained(model_name).to(device)
     tokenizer = AutoTokenizer.from_pretrained(model_name)
 
-    eval_ds = dts.load_dataset("tiagoblima/qg_squad_v1_pt", split=split_name)
+    eval_ds = dts.load_dataset(dataset_name, split=split_name)
 
     def generate_input(tup_example):
           
