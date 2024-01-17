@@ -754,7 +754,7 @@ def main():
         tokenizer=tokenizer,
         data_collator=data_collator,
         compute_metrics=compute_metrics if training_args.predict_with_generate else None,
-        post_process_function=post_processing_function,
+       
     )
 
     # Training
