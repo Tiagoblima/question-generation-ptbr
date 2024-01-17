@@ -30,7 +30,7 @@ import evaluate
 import numpy as np
 from datasets import load_dataset
 from trainer_seq2seq_qg import QuestionAnsweringSeq2SeqTrainer
-
+from transformers import Trainer, Seq2SeqTrainer
 import transformers
 from transformers import (
     AutoConfig,
@@ -745,8 +745,8 @@ def main():
         model = prepare_model_for_int8_training(model) if model_args.load_in_8bit else model
         peft_model = get_peft_model(model, config)
         print_trainable_parameters(peft_model)
-
-    trainer = QuestionAnsweringSeq2SeqTrainer(
+    #QuestionAnsweringSeq2Seq
+    trainer = Seq2SeqTrainer(
         model=peft_model if model_args.peft_train else model,
         args=training_args,
         train_dataset=train_dataset if training_args.do_train else None,
