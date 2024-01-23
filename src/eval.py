@@ -52,7 +52,7 @@ def main(model_name,
     print(bleu_scores)
     os.makedirs(output_dir, exist_ok=True)
     full_outpath = os.path.join(output_dir, "metrics.json")
-    json.dump(open(bleu_scores, full_outpath, "w"), indent=4)
+    json.dump(bleu_scores, open(full_outpath, "w"), indent=4)
 
     
     
