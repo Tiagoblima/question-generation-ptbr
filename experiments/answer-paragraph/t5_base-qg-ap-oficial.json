@@ -55,7 +55,7 @@
     "max_answer_length": 96,
     "val_max_answer_length": null,
     "pad_to_max_length": true,
-    "max_train_samples": null,
+    "max_train_samples": 10,
     "max_eval_samples": null,
     "max_predict_samples": null,
     "version_2_with_negative": false,

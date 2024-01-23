@@ -548,6 +548,7 @@ def main():
         text_inputs = [generate_input(example) for example in zip(*text_inputs)]
         inputs = examples[model_args.input_names[0]]
         targets = examples[question_column]
+        print(inputs, targets)
         return inputs, targets
 
     def preprocess_function(examples):
