@@ -47,11 +47,12 @@ def main(model_name,
 
     
     candidates = open(pred_file).readlines()
+    print(len(candidates), len(refs))
     bleu_scores = bleu.get_corpus_bleu(refs, candidates, language=langdict[lang])
     print(bleu_scores)
     os.makedirs(output_dir, exist_ok=True)
     full_outpath = os.path.join(output_dir, "metrics.json")
-    json.dump(open(full_outpath, "w"), indent=4)
+    json.dump(open(bleu_scores, full_outpath, "w"), indent=4)
 
     
     
