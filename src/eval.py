@@ -10,10 +10,10 @@ langdict = {
 }
 
 @click.command()
-@click.option("-m", "model_name", type=str)
-@click.option("-d", "dataset_name", type=str, default="tiagoblima/qg_squad_v1_pt")
-@click.option("-r", "-ref_file", type=str, default=None)
-@click.option("-p", "-pred_file", type=str, default="hypothesis.txt")
+@click.option("-m", "--model_name", type=str)
+@click.option("-d", "--dataset_name", type=str, default="tiagoblima/qg_squad_v1_pt")
+@click.option("-r", "--ref_file", type=str, default=None)
+@click.option("-p", "--pred_file", type=str, default="hypothesis.txt")
 @click.option("-i","--input_names", type=str, default="paragraph,answer")
 @click.option("-o","--output_dir", type=str, default="validation")
 @click.option("-t","--target_name", type=str, default="question")
