@@ -441,3 +441,7 @@ def postprocess_qa_predictions_with_beam_search(
                 writer.write(json.dumps(scores_diff_json, indent=4) + "\n")
 
     return all_predictions, scores_diff_json
+
+
+def get_qg_model_prediction(model, dataset, input_names):
+    raise NotImplemented
