@@ -4,6 +4,7 @@ import os
 from metrics import bleu
 import json 
 import bert_score
+import evaluate
 
 langdict = {
     "pt": "portuguese"
@@ -49,16 +50,15 @@ def main(model_name,
     candidates = open(pred_file).readlines()
     
     scores = bleu.get_corpus_bleu(refs, candidates, language=langdict[lang])
-    print(scores)
+    
     os.makedirs(output_dir, exist_ok=True)
     full_outpath = os.path.join(output_dir, "metrics.json")
+   
+    rouge = evaluate.load('rouge').compute(predictions=candidates,
+                         references=refs)
 
-    bertscore = bert_score.score(
-        candidates, refs, 
-        rescale_with_baseline=True, lang="en"
-    )
-    bertscore = {"bert_score_"+k: v for k, v in bertscore.items()}
-    scores.update(bertscore)
+    scores.update(rouge)
+    print(scores)
     json.dump(scores, open(full_outpath, "w"), indent=4)
 
     
