@@ -47,7 +47,7 @@ def main(model_name,
 
     
     candidates = open(pred_file).readlines()
-    print(len(candidates), len(refs))
+    
     bleu_scores = bleu.get_corpus_bleu(refs, candidates, language=langdict[lang])
     print(bleu_scores)
     os.makedirs(output_dir, exist_ok=True)
