@@ -1,9 +1,9 @@
 import click
 import datasets as dts
-import numpy as np 
 import os
 from metrics import bleu
 import json 
+import bert_score
 
 langdict = {
     "pt": "portuguese"
@@ -48,11 +48,18 @@ def main(model_name,
     
     candidates = open(pred_file).readlines()
     
-    bleu_scores = bleu.get_corpus_bleu(refs, candidates, language=langdict[lang])
-    print(bleu_scores)
+    scores = bleu.get_corpus_bleu(refs, candidates, language=langdict[lang])
+    print(scores)
     os.makedirs(output_dir, exist_ok=True)
     full_outpath = os.path.join(output_dir, "metrics.json")
-    json.dump(bleu_scores, open(full_outpath, "w"), indent=4)
+
+    bertscore = bert_score.score(
+        candidates, refs, 
+        rescale_with_baseline=True, lang="en"
+    )
+    bertscore = {"bert_score_"+k: v for k, v in bertscore.items()}
+    scores.update(bertscore)
+    json.dump(scores, open(full_outpath, "w"), indent=4)
 
     
     
