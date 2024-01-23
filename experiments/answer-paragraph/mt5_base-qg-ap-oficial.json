@@ -40,7 +40,7 @@
     "token": null,
     "use_auth_token": null,
     "trust_remote_code": false,
-    "dataset_name": "tiagoblima/qg_squad_v1_pt",
+    "dataset_name": "tiagoblima/du-qg-squadv1_pt",
     "dataset_config_name": null,
     "context_column": "context",
     "question_column": "question",
