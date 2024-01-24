@@ -545,10 +545,10 @@ def main():
         def generate_input(tup_example):
             return f"{tokenizer.eos_token}".join(tup_example)
 
-        text_inputs = [generate_input(example) for example in zip(*text_inputs)]
-        inputs = examples[model_args.input_names[0]]
+        inputs = [generate_input(example) for example in zip(*text_inputs)]
+      
         targets = examples[question_column]
-        print(inputs, targets)
+        
         return inputs, targets
 
     def preprocess_function(examples):
@@ -635,7 +635,7 @@ def main():
     if training_args.do_eval:
         if "validation" not in raw_datasets:
             raise ValueError("--do_eval requires a validation dataset")
-        eval_examples = raw_datasets["validation"]
+        eval_examples = raw_datasets["train"]
         if data_args.max_eval_samples is not None:
             # We will select sample from whole data
             max_eval_samples = min(len(eval_examples), data_args.max_eval_samples)
