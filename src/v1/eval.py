@@ -55,7 +55,7 @@ def main(model_name,
         
         model_inputs = tokenizer(text_inputs,
                                   max_length=model.config.max_length, 
-                                  padding=True, truncation=True, return_tensors="pt")
+                                  padding=True, truncation=False, return_tensors="pt")
         
         # Tokenize targets with text_target=...
         for inps in model_inputs:
