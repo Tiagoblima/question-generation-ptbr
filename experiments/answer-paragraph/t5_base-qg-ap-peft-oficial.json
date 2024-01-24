@@ -6,7 +6,7 @@
     "tgt_lang": "",
     "cache_dir": null,
     "load_in_8bit": false,
-    "peft_train": false,
+    "peft_train": true,
     "peft_config": {
         "peft_type": "LORA",
         "auto_mapping": null,
