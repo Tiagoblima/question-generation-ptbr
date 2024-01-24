@@ -548,7 +548,7 @@ def main():
         inputs = [generate_input(example) for example in zip(*text_inputs)]
       
         targets = examples[question_column]
-        
+        print(inputs,"\n", targets)
         return inputs, targets
 
     def preprocess_function(examples):
