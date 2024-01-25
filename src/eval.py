@@ -3,7 +3,7 @@ import datasets as dts
 import os
 from metrics import bleu
 import json 
-import bert_score
+from metrics.rouge import Rouge
 import evaluate
 
 langdict = {
@@ -11,33 +11,21 @@ langdict = {
 }
 
 @click.command()
-@click.option("-m", "--model_name", type=str)
 @click.option("-d", "--dataset_name", type=str, default="tiagoblima/du-qg-squadv1_pt")
 @click.option("-r", "--ref_file", type=str, default=None)
 @click.option("-p", "--pred_file", type=str, default="hypothesis.txt")
 @click.option("-i","--input_names", type=str, default="paragraph,answer")
-@click.option("-o","--output_dir", type=str, default="validation")
+@click.option("-o","--output_dir", type=str, default="results")
 @click.option("-t","--target_name", type=str, default="question")
-@click.option("--metrics", type=str, default="sacrebleu")
 @click.option("--split_name", type=str, default="test")
-@click.option("-bs", "--batch_size", type=int, default=16)
-@click.option("-ml", "--max_new_tokens", type=int, default=96)
-@click.option("--num_beams", type=int, default=5)
-@click.option("--num_proc", type=int, default=1)
 @click.option("--lang", type=str, default='pt')
-def main(model_name,
+def main(
          dataset_name,
          ref_file,
          pred_file,
-         metrics, 
          output_dir,
-         input_names,
          target_name,
          split_name,
-         batch_size,
-         max_new_tokens,
-         num_beams,
-         num_proc,
          lang
          ):
     
@@ -56,8 +44,11 @@ def main(model_name,
    
     rouge = evaluate.load('rouge').compute(predictions=candidates,
                          references=refs)
-
+    
     scores.update(rouge)
+    scores.update({
+        "rougeL": Rouge().calc_score(candidates, refs)
+    })
     print(scores)
     json.dump(scores, open(full_outpath, "w"), indent=4)
 
