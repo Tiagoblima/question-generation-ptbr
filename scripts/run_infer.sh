@@ -1,8 +1,8 @@
-INPUTS=$1
-PRED_FILE=$2
+MODEL=$1
+INPUTS=$2
 DATASET=tiagoblima/du-qg-squadv1_pt
 OUTPUT_DIR="/content/drive/MyDrive/QuestionGeneration/Reports/"
-python src/v1/eval.py --pred_file $PRED_FILE  \
+python src/infer.py -m $MODEL  \
                    -d $DATASET \
                    -i $INPUTS \
                    -o $OUTPUT_DIR
