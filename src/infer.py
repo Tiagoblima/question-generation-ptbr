@@ -12,7 +12,7 @@ from nltk.translate.bleu_score import sentence_bleu
 
 @click.command()
 @click.option("-m", "model_name", type=str)
-@click.option("-d", "dataset_name", type=str, default="tiagoblima/qg_squad_v1_pt")
+@click.option("-d", "dataset_name", type=str, default="tiagoblima/du-qg-squadv1_pt")
 @click.option("-i","--input_names", type=str, default="paragraph,answer")
 @click.option("-o","--output_dir", type=str, default="validation")
 @click.option("-t","--target_name", type=str, default="question")
