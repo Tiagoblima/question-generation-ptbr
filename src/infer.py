@@ -18,7 +18,7 @@ from nltk.translate.bleu_score import sentence_bleu
 @click.option("-t","--target_name", type=str, default="question")
 @click.option("--metrics", type=str, default="sacrebleu")
 @click.option("--split_name", type=str, default="test")
-@click.option("-bs", "--batch_size", type=int, default=32)
+@click.option("-bs", "--batch_size", type=int, default=16)
 @click.option("-ml", "--max_new_tokens", type=int, default=96)
 @click.option("--num_beams", type=int, default=5)
 @click.option("--num_proc", type=int, default=1)
