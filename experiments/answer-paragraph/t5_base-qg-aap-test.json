@@ -56,7 +56,7 @@
     "val_max_answer_length": null,
     "pad_to_max_length": true,
     "max_train_samples": 8,
-    "max_eval_samples": null,
+    "max_eval_samples": 8,
     "max_predict_samples": null,
     "version_2_with_negative": false,
     "null_score_diff_threshold": 0.0,
