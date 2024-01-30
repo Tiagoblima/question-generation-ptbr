@@ -2,9 +2,10 @@ import click
 import datasets as dts
 import os
 from metrics import bleu
-import json 
+import spacy
 from metrics.rouge import Rouge
 import evaluate
+import pandas as pd 
 
 langdict = {
     "pt": "portuguese"
@@ -14,7 +15,6 @@ langdict = {
 @click.option("-d", "--dataset_name", type=str, default="tiagoblima/du-qg-squadv1_pt")
 @click.option("-r", "--ref_file", type=str, default=None)
 @click.option("-p", "--pred_file", type=str, default="hypothesis.txt")
-@click.option("-i","--input_names", type=str, default="paragraph,answer")
 @click.option("-o","--output_dir", type=str, default="results")
 @click.option("-t","--target_name", type=str, default="question")
 @click.option("--split_name", type=str, default="test")
@@ -32,27 +32,23 @@ def main(
     if not ref_file:
         refs = dts.load_dataset(dataset_name)[split_name][target_name]
     else:
-        refs = open(ref_file).readlines()
+        refs = [ref.strip("\n") for ref in open(ref_file).readlines()]
 
-    
-    candidates = open(pred_file).readlines()
+
+    candidates = [cand.strip("\n") for cand in open(pred_file).readlines()]
     
     scores = bleu.get_corpus_bleu(refs, candidates, language=langdict[lang])
     
     os.makedirs(output_dir, exist_ok=True)
-    full_outpath = os.path.join(output_dir, "metrics.json")
+    full_outpath = output_dir + ".csv"
    
     rouge = evaluate.load('rouge').compute(predictions=candidates,
                          references=refs)
-    
     scores.update(rouge)
-    scores.update({
-        "rougeL": Rouge().calc_score(candidates, refs)
-    })
-    print(scores)
-    json.dump(scores, open(full_outpath, "w"), indent=4)
 
+    metrics_df = pd.DataFrame.from_dict(scores, orient="index").T.loc[:, ["Bleu_4","rougeL"]]
     
+    metrics_df.to_csv(full_outpath,index=False)
     
 
 if __name__ == "__main__":
