@@ -1,8 +1,7 @@
-INPUTS=$1
-PRED_FILE=$2
-DATASET=tiagoblima/preprocessed-du-qg-squadv1_pt
-OUTPUT_DIR="/content/drive/MyDrive/QuestionGeneration/Reports/"
+BASE_DIR="./reports/tiagoblima/mt5_base-qg-af-oficial"
+PRED_FILE="${BASE_DIR}/hypothesis.txt"
+REF_FILE="./data/du-squadv1/test.ref"
+
 python src/eval.py --pred_file $PRED_FILE  \
-                   -d $DATASET \
-                   -i $INPUTS \
-                   -o $OUTPUT_DIR
+                   --ref_file $REF_FILE \
+                   -o $BASE_DIR
