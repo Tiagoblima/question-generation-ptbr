@@ -1,10 +1,8 @@
 import click
 import datasets as dts
-import os
 from metrics import bleu
-import spacy
 from metrics.rouge import Rouge
-import evaluate
+from nltk.tokenize import word_tokenize
 import pandas as pd 
 
 langdict = {
@@ -39,15 +37,18 @@ def main(
     
     scores = bleu.get_corpus_bleu(refs, candidates, language=langdict[lang])
     
-    os.makedirs(output_dir, exist_ok=True)
-    full_outpath = output_dir + ".csv"
-   
-    rouge = evaluate.load('rouge').compute(predictions=candidates,
-                         references=refs)
-    scores.update(rouge)
-
-    metrics_df = pd.DataFrame.from_dict(scores, orient="index").T.loc[:, ["Bleu_4","rougeL"]]
     
+    full_outpath = output_dir + ".csv"
+    rouge = Rouge()
+    cands = dict(zip(list(range(len(candidates))), [[" ".join(word_tokenize(cand))] for cand in candidates]))
+    refs = dict(zip(list(range(len(candidates))), [[" ".join(word_tokenize(ref))] for ref in refs]))
+    rouge_score, _ = rouge.compute_score(refs,cands)
+    scores.update({
+        "rougeL": rouge_score
+    })
+    scores["model"] = full_outpath.split("/")[-1]
+    metrics_df = pd.DataFrame.from_dict(scores, orient="index").T.loc[:, ["model", "Bleu_4","rougeL"]]
+    print(metrics_df.to_csv(header=False))
     metrics_df.to_csv(full_outpath,index=False)
     
 
