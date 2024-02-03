@@ -102,7 +102,7 @@ def eval(out_file, src_file, tgt_file, isDIn = False, num_pairs = 500):
 
 if __name__ == "__main__":
     parser = ArgumentParser()
-    parser.add_argument("-out", "--out_file", dest="out_file", default="../../reports/tiagoblima/t5_base-qg-aap-oficial/hypothesis.txt", help="output file to compare")
+    parser.add_argument("-out", "--out_file", dest="out_file", default="../../data/du-squadv1/preds/t5_base-qg-aap.txt", help="output file to compare")
     parser.add_argument("-src", "--src_file", dest="src_file", default="../../data/du-squadv1/src-test.txt", help="src file")
     parser.add_argument("-tgt", "--tgt_file", dest="tgt_file", default="../../data/du-squadv1/tgt-test.txt", help="target file")
     args = parser.parse_args()
@@ -111,9 +111,9 @@ if __name__ == "__main__":
     report = eval(args.out_file, args.src_file, args.tgt_file)
 
     report.update({
-        "model": args.out_file.split("/")[-2]
+        "model": args.out_file.split("/")[-1].split(".")[0]
     })
     report_df = pd.DataFrame.from_dict(report, orient='index').T
-    print(report_df)
+    print(report_df.to_csv(index=False))
 
 
