@@ -38,7 +38,7 @@ def main(
     scores = bleu.get_corpus_bleu(refs, candidates, language=langdict[lang])
     
     
-    full_outpath = output_dir + ".csv"
+   
     rouge = Rouge()
     cands = dict(zip(list(range(len(candidates))), [[" ".join(word_tokenize(cand))] for cand in candidates]))
     refs = dict(zip(list(range(len(candidates))), [[" ".join(word_tokenize(ref))] for ref in refs]))
@@ -46,10 +46,10 @@ def main(
     scores.update({
         "rougeL": rouge_score
     })
-    scores["model"] = full_outpath.split("/")[-1]
+    scores["model"] = output_dir.split("/")[-1]
     metrics_df = pd.DataFrame.from_dict(scores, orient="index").T.loc[:, ["model", "Bleu_4","rougeL"]]
     print(metrics_df.to_csv(header=False))
-    metrics_df.to_csv(full_outpath,index=False)
+    metrics_df.to_csv(output_dir + ".csv",index=False)
     
 
 if __name__ == "__main__":
