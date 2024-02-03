@@ -5,7 +5,7 @@ import nltk
 nltk.download('punkt')
 from nltk.tokenize import word_tokenize
 from nltk.translate.bleu_score import sentence_bleu
-from metrics import rouge, bleu
+from v1.metrics import rouge, bleu
 import evaluate
 from tqdm import tqdm
 BASE_DIR="/home/tiagoblima/repos/question-generation-ptbr/reports/tiagoblima"
@@ -13,7 +13,8 @@ sent_bleu = []
 
 test_set = dts.load_dataset("tiagoblima/preprocessed-du-qg-squadv1_pt", split="test")
 
-rougel = evaluate.load("rouge")
+open("src-sent.txt", "w").writelines([ex["paragraph"] + "\n" for ex in test_set ])
+
 rouge = rouge.Rouge()
 for model_dir in os.listdir(BASE_DIR):
 
