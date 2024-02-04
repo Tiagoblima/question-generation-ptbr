@@ -7,13 +7,17 @@ from collections import defaultdict
 from argparse import ArgumentParser
 from text_normalization import text_normalization
 import pandas as pd
-import sys
+import re
 # reload(sys)
 
 # import importlib,sys
 # importlib.reload(sys)
 
 # sys.setdefaultencoding('utf-8')
+def rejoin_punct(text):
+    #text = re.sub(f"(\w+)\s[?!.,;]", "\1", text) 
+    
+    return text
 
 class QGEvalCap:
     def __init__(self, gts, res):
@@ -33,6 +37,7 @@ class QGEvalCap:
         # Compute scores
         # =================================================
         report = {}
+        all_scores = {}
         for scorer, method in scorers:
             # print 'computing %s score...'%(scorer.method())
             score, scores = scorer.compute_score(self.gts, self.res)
@@ -41,16 +46,19 @@ class QGEvalCap:
                 for sc, scs, m in zip(score, scores, method):
                     print ("%s: %0.5f"%(m, sc))
                     output.append(sc)
+                    all_scores[m] = scs
             else:
                 print ("%s: %0.5f"%(method, score))
                 report.update({
                     method: score
                 })
+                all_scores[method] = scores
                 output.append(score)
+        all_scores["res"] = [rejoin_punct( res[0].decode()) for res in self.res.values()]
+        all_scores["tokenized_sentence"] = [rejoin_punct(sent) for sent in self.res.keys()]
+        return report, all_scores
 
-        return report
-
-def eval(out_file, src_file, tgt_file, isDIn = False, num_pairs = 500):
+def eval(out_file, src_file, tgt_file):
     """
         Given a filename, calculate the metric scores for that prediction file
 
@@ -108,7 +116,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     print ("scores: \n")
-    report = eval(args.out_file, args.src_file, args.tgt_file)
+    report, _ = eval(args.out_file, args.src_file, args.tgt_file)
 
     report.update({
         "model": args.out_file.split("/")[-1].split(".")[0]
